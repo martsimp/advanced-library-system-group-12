@@ -3,8 +3,11 @@ dotenv.config();
 
 const express = require('express');
 const db = require('./src/config/database');
+const userRoutes = require('./src/services/user/userRoutes');
 
 const app = express();
+
+app.use('/api/users', userRoutes);
 
 // Test database route
 app.get('/test-db', async (req, res) => {
