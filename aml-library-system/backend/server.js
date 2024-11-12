@@ -9,11 +9,9 @@ const inventoryRoutes = require('./src/services/inventory/inventoryRoutes');
 
 const app = express();
 
-// MIDDLEWARE CORS
+// Configure CORS to allow requests from the frontend!!
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:3000',
+  origin: 'http://localhost:3000', // MAKE SURE YOURE RUNNING FRONT END FROM 3000
   credentials: true
 }));
 
@@ -24,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
 
-// Test for da db
+// Test for the DB
 app.get('/test-db', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
@@ -47,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 // Port
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5003;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -7,6 +7,9 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
 
+// DEBUGGING LOG
+console.log('Backend URL:', process.env.REACT_APP_BACKEND_URL);
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: '',
@@ -46,7 +49,7 @@ export default function RegisterPage() {
       console.log('Firebase user created:', userCredential.user.uid);
 
       try {
-        // Create user in your database
+        // Create user in the DB
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
           method: 'POST',
           headers: {
@@ -67,7 +70,6 @@ export default function RegisterPage() {
         });
 
         if (!response.ok) {
-          // This will delete the user from firebase if the database creation fails
           await userCredential.user.delete();
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to create user profile');
@@ -87,7 +89,6 @@ export default function RegisterPage() {
       if (err.code === 'auth/email-already-in-use') {
         setError('This email is already registered. Please try logging in instead.');
       } else if (err.code) {
-        // Other Firebase Auth errors
         switch (err.code) {
           case 'auth/invalid-email':
             setError('Invalid email format');
