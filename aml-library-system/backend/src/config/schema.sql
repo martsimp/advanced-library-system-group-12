@@ -10,7 +10,8 @@ CREATE TABLE users (
     city VARCHAR(100),
     postal_code VARCHAR(20),
     notifications_enabled BOOLEAN DEFAULT true,
-    outstanding_fines DECIMAL(10,2) DEFAULT 0.00
+    outstanding_fines DECIMAL(10,2) DEFAULT 0.00,
+    firebase_uid VARCHAR(128) UNIQUE
 );
 
 -- MEDIA TABLE
