@@ -1,7 +1,7 @@
 const inventoryRepository = require('./inventoryRepository');
 
-async function getAllMedia() {
-    return await inventoryRepository.getAllMedia();
+async function getAllMedia(filter) {
+    return await inventoryRepository.getAllMedia(filter);
 }
 
 module.exports = {

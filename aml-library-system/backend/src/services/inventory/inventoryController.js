@@ -2,13 +2,23 @@ const inventoryService = require('./inventoryService');
 
 async function getAllMedia(req, res) {
     try {
-        const users = await inventoryService.getAllMedia();
-        res.json(users);
+        const media = await inventoryService.getAllMedia(req.query);
+        res.json(media);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function getMediaById(req, res) {
+    try {
+        const media = await inventoryService.getAllMedia({ id: req.params.id });
+        res.json(media);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
 
 module.exports = {
-    getAllMedia
+    getAllMedia,
+    getMediaById
 };
