@@ -4,10 +4,12 @@ dotenv.config();
 const express = require('express');
 const db = require('./src/config/database');
 const userRoutes = require('./src/services/user/userRoutes');
+const inventoryRoutes = require('./src/services/inventory/inventoryRoutes');
 
 const app = express();
 
 app.use('/api/users', userRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Test database route
 app.get('/test-db', async (req, res) => {
