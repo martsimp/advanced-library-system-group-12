@@ -2,14 +2,27 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
+const cors = require('cors');
 const db = require('./src/config/database');
 const userRoutes = require('./src/services/user/userRoutes');
 
 const app = express();
 
+// MIDDLEWARE CORS
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL 
+    : 'http://localhost:3000',
+  credentials: true
+}));
+
+// PARSER FOR MIDDLEWARE
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use('/api/users', userRoutes);
 
-// Test database route
+// Test for da db
 app.get('/test-db', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
