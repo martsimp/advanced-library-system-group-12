@@ -36,9 +36,19 @@ async function updateMedia(req, res) {
     }
 }
 
+async function deleteMedia(req, res) {
+    try {
+        await inventoryService.deleteMedia(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getAllMedia,
     getMediaById,
     createMedia,
-    updateMedia
+    updateMedia,
+    deleteMedia
 };

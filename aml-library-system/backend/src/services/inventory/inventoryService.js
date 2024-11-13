@@ -12,9 +12,13 @@ async function updateMedia(id, info) {
     return await inventoryRepository.updateMedia(id, info);
 }
 
+async function deleteMedia(id) {
+    return await inventoryRepository.deleteMedia(id);
+}
+
 module.exports = {
     getAllMedia,
     createMedia,
     updateMedia,
-    updateMedia
+    deleteMedia
 };

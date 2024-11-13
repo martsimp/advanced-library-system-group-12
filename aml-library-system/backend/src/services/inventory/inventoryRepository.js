@@ -54,8 +54,14 @@ async function updateMedia(id, data) {
     return result.rows[0];
 }
 
+async function deleteMedia(id) {
+    const sql = format("DELETE FROM media WHERE id = %L", id);
+    const result = await db.query(sql);
+}
+
 module.exports = {
     getAllMedia,
     createMedia,
-    updateMedia
+    updateMedia,
+    deleteMedia
 };
