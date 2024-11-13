@@ -1,5 +1,6 @@
 const db = require('../../config/database');
 const SqlFilter = require('../../utils/sqlFilter');
+const SqlUpdate = require('../../utils/sqlUpdate');
 const format = require("pg-format");
 
 async function getAllMedia(filter) {
@@ -25,13 +26,36 @@ async function createMedia(data) {
         "INSERT INTO media (title, author, genre, publication_year, format, status, description, total_copies) VALUES (%L, %L, %L, %L, %L, %L, %L, %L) RETURNING id",
         data.title, data.author, data.genre, data.publication_year, data.format, data.status, data.description, data.total_copies
     );
-    console.debug(data);
-    console.debug(sql);
+
     const result = await db.query(sql);
+    return result.rows[0];
+}
+
+async function updateMedia(id, data) {
+    if (id === undefined) {
+        throw new Error("missing ID");
+    }
+
+    console.debug(id);
+
+    const update = new SqlUpdate("media");
+    update.addEqualFilter("id", id);
+    update.addField("title", data.title);
+    update.addField("author", data.author);
+    update.addField("genre", data.genre);
+    update.addField("publication_year", data.publication_year);
+    update.addField("format", data.format);
+    update.addField("status", data.status);
+    update.addField("description", data.description);
+    update.addField("total_copies", data.total_copies);
+
+    console.debug(update.generate());
+    const result = await db.query(update.generate());
     return result.rows[0];
 }
 
 module.exports = {
     getAllMedia,
-    createMedia
+    createMedia,
+    updateMedia
 };
