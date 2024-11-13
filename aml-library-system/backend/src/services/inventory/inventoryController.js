@@ -18,7 +18,17 @@ async function getMediaById(req, res) {
     }
 }
 
+async function createMedia(req, res) {
+    try {
+        const media = await inventoryService.createMedia(req.body);
+        res.json(media);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getAllMedia,
-    getMediaById
+    getMediaById,
+    createMedia
 };
