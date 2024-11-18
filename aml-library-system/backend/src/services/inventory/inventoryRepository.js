@@ -59,9 +59,52 @@ async function deleteMedia(id) {
     const result = await db.query(sql);
 }
 
+async function getReservations(filter) {
+    let f = new SqlFilter('SELECT * FROM reservations WHERE TRUE', []);
+    f.addEqualFilter("id", filter.id);
+    f.addEqualFilter("user_id", filter.user_id);
+    f.addEqualFilter("media_id", filter.media_id);
+    f.addEqualFilter("branch_id", filter.branch_id);
+    const result = await db.query(f.generate());
+    return result.rows;
+}
+
+async function createReservation(data) {
+    const existing = await getReservations({ media_id: data.media_id, branch_id: data.branch_id });
+    const queue = Math.max(...existing.map(o => o.queue_position), 0) + 1;
+
+    const sql = format("INSERT INTO reservations (user_id, media_id, branch_id, reserve_date, status, queue_position, notification_sent) VALUES (%L, %L, %L, CURRENT_TIMESTAMP(), 'active', %L, false) RETURNING id",
+        data.user, data.media_id, data.branch_id, queue);
+    const result = await db.query(sql);
+    return result.rows[0];
+}
+
+async function deleteReservation(id) {
+    const sql = format("DELETE FROM reservations WHERE id = %L", id);
+    await db.query(sql);
+}
+
+async function fulfillReservation(id) {
+    const res = await getReservations({ "id": id });
+    if (res.length !== 1) {
+        throw new Error("Unknown reservation ID");
+    }
+
+    const sql = format("UPDATE reservations SET status = 'fulfilled' WHERE id = %L", id);
+    await db.query(sql);
+
+    // Now update the positions of all pending reservations
+    const posSql = format("UPDATE reservations SET queue_position = queue_position - 1 WHERE STATUS = 'active' AND media_id = %L AND branch_id = %L", res.media_id, res.branch_id);
+    await db.query(sql);
+}
+
 module.exports = {
     getAllMedia,
     createMedia,
     updateMedia,
-    deleteMedia
+    deleteMedia,
+    getReservations,
+    createReservation,
+    deleteReservation,
+    fulfillReservation,
 };

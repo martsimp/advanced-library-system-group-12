@@ -1,5 +1,6 @@
 const express = require('express');
 const userRoutes = require('./services/user/userRoutes');
+const inventoryRoutes = require('./services/inventory/inventoryRoutes');
 
 const app = express();
 
@@ -9,6 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 //  Middl ware eror handling
 app.use((err, req, res, next) => {

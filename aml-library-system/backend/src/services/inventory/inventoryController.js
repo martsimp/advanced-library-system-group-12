@@ -45,10 +45,51 @@ async function deleteMedia(req, res) {
     }
 }
 
+async function getReservations(req, res) {
+    try {
+        const result = await inventoryService.getReservations(req.body);
+        res.json(result);
+    } catch (error) {
+        throw error;
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function createReservation(req, res) {
+    try {
+        const result = await inventoryService.createReservation(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function fulfillReservation(req, res) {
+    try {
+        await inventoryService.fulfillReservation(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function deleteReservation(req, res) {
+    try {
+        await inventoryService.deleteReservation(req.params.id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getAllMedia,
     getMediaById,
     createMedia,
     updateMedia,
-    deleteMedia
+    deleteMedia,
+    getReservations,
+    createReservation,
+    fulfillReservation,
+    deleteReservation,
 };
