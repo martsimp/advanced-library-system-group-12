@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
-import { Card, CardHeader } from '../components/ui/Card';
+import { Card, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
@@ -56,16 +56,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md p-8">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to access your library account.</p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <Card className="w-full max-w-md p-8 shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+          <CardDescription className="text-center">
+            Sign in to access your library account.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Email
+              </label>
               <Input
                 id="email"
                 type="email"
@@ -77,8 +81,10 @@ export default function LoginPage() {
                 className="w-full"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Password
+              </label>
               <Input
                 id="password"
                 type="password"
@@ -91,21 +97,26 @@ export default function LoginPage() {
               />
             </div>
             {error && (
-              <Alert variant="error">
+              <Alert variant="error" className="mt-4">
                 {error}
               </Alert>
             )}
           </div>
-          <div className="space-y-4">
-            <Button type="submit" disabled={loading} className="w-full py-2 text-base">
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-            <div className="text-center text-sm">
-              <span>Don't have an account? </span>
-              <Link to="/register" className="text-blue-500 hover:underline">
-                Register
-              </Link>
-            </div>
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+          <div className="text-center text-sm">
+            <span className="text-gray-600">Don't have an account? </span>
+            <Link 
+              to="/register" 
+              className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+            >
+              Register
+            </Link>
           </div>
         </form>
       </Card>
