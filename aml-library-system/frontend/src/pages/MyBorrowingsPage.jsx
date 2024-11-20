@@ -22,12 +22,18 @@ export default function MyBorrowingsPage() {
     const fetchBorrowedBooks = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/transactions/user/${currentUser.uid}/current`);
-        if (!response.ok) {
+        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${currentUser.uid}`);
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await userResponse.json();
+        
+        const borrowingsResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/transactions/user/${userData.id}/current`);
+        if (!borrowingsResponse.ok) {
           throw new Error('Failed to fetch borrowed books');
         }
-        const data = await response.json();
-        setBorrowedBooks(data);
+        const borrowingsData = await borrowingsResponse.json();
+        setBorrowedBooks(borrowingsData);
       } catch (error) {
         console.error('Error fetching borrowed books:', error);
       } finally {
@@ -35,7 +41,9 @@ export default function MyBorrowingsPage() {
       }
     };
 
-    fetchBorrowedBooks();
+    if (currentUser) {
+      fetchBorrowedBooks();
+    }
   }, [currentUser]);
 
   if (loading) {
@@ -44,7 +52,6 @@ export default function MyBorrowingsPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header with back button */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
@@ -61,7 +68,6 @@ export default function MyBorrowingsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">My Borrowings</h1>
-        {/* Current Borrowings */}
         <Card className="bg-white shadow-lg">
           <CardHeader>
             <CardTitle>Currently Borrowed Books</CardTitle>

@@ -22,12 +22,18 @@ export default function MyReservationsPage() {
     const fetchReservations = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations/user/${currentUser.uid}/current`);
-        if (!response.ok) {
+        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${currentUser.uid}`);
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await userResponse.json();
+        
+        const reservationsResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations/user/${userData.id}/current`);
+        if (!reservationsResponse.ok) {
           throw new Error('Failed to fetch reservations');
         }
-        const data = await response.json();
-        setReservations(data);
+        const reservationsData = await reservationsResponse.json();
+        setReservations(reservationsData);
       } catch (error) {
         console.error('Error fetching reservations:', error);
       } finally {
@@ -35,7 +41,9 @@ export default function MyReservationsPage() {
       }
     };
 
-    fetchReservations();
+    if (currentUser) {
+      fetchReservations();
+    }
   }, [currentUser]);
 
   if (loading) {
@@ -44,7 +52,6 @@ export default function MyReservationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header with back button */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
@@ -61,7 +68,6 @@ export default function MyReservationsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">My Reservations</h1>
-        {/* Active Reservations */}
         <Card className="bg-white shadow-lg">
           <CardHeader>
             <CardTitle>Current Reservations</CardTitle>
