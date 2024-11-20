@@ -59,7 +59,22 @@ async function getUserReadingHistory(userId) {
     };
 }
 
+async function renewBook(transactionId, newDueDate) {
+    const query = `
+        UPDATE transactions 
+        SET due_date = $1
+        WHERE id = $2 
+        AND status = 'borrowed'
+        AND return_date IS NULL
+        RETURNING *
+    `;
+    
+    const result = await db.query(query, [newDueDate, transactionId]);
+    return result.rows[0];
+}
+
 module.exports = {
     getUserCurrentBorrowings,
-    getUserReadingHistory
+    getUserReadingHistory,
+    renewBook
 }; 

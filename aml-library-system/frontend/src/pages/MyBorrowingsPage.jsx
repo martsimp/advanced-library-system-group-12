@@ -12,11 +12,14 @@ import {
 } from '../components/ui/Card';
 import { Badge } from '../components/ui/badge';
 import { LoadingPage } from '../components/ui/spinner';
+import { RenewalModal } from '../components/RenewalModal';
 
 export default function MyBorrowingsPage() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isRenewalModalOpen, setIsRenewalModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBorrowedBooks = async () => {
@@ -45,6 +48,22 @@ export default function MyBorrowingsPage() {
       fetchBorrowedBooks();
     }
   }, [currentUser]);
+
+  const handleRenewalClick = (book) => {
+    setSelectedBook(book);
+    setIsRenewalModalOpen(true);
+  };
+
+  const handleRenewalComplete = (transactionId, newDueDate) => {
+    console.log('Updating book with transaction ID:', transactionId);
+    setBorrowedBooks(books => 
+      books.map(book => 
+        book.transaction_id === transactionId 
+          ? { ...book, due_date: newDueDate }
+          : book
+      )
+    );
+  };
 
   if (loading) {
     return <LoadingPage />;
@@ -111,7 +130,7 @@ export default function MyBorrowingsPage() {
                       </div>
                     </div>
                     <div className="mt-4 md:mt-0 flex items-center gap-2">
-                      <Button size="sm">Renew</Button>
+                      <Button size="sm" onClick={() => handleRenewalClick(book)}>Renew</Button>
                       <Button size="sm" variant="outline">Return</Button>
                     </div>
                   </div>
@@ -121,6 +140,18 @@ export default function MyBorrowingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {selectedBook && (
+        <RenewalModal
+          book={selectedBook}
+          isOpen={isRenewalModalOpen}
+          onClose={() => {
+            setIsRenewalModalOpen(false);
+            setSelectedBook(null);
+          }}
+          onRenew={handleRenewalComplete}
+        />
+      )}
     </div>
   );
 } 

@@ -22,7 +22,21 @@ async function getUserReadingHistory(req, res) {
     }
 }
 
+async function renewBook(req, res) {
+    try {
+        const { transactionId } = req.params;
+        const { new_due_date } = req.body;
+        
+        const updatedTransaction = await transactionsService.renewBook(transactionId, new_due_date);
+        res.json(updatedTransaction);
+    } catch (error) {
+        console.error('Error renewing book:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getUserCurrentBorrowings,
-    getUserReadingHistory
+    getUserReadingHistory,
+    renewBook
 }; 
