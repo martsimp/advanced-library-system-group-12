@@ -6,6 +6,7 @@ const cors = require('cors');
 const db = require('./src/config/database');
 const userRoutes = require('./src/services/user/userRoutes');
 const inventoryRoutes = require('./src/services/inventory/inventoryRoutes');
+const transactionsRoutes = require('./src/services/transactions/transactionsRoutes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
 // Test for the DB
 app.get('/test-db', async (req, res) => {

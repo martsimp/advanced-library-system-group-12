@@ -19,6 +19,20 @@ export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [borrowedBooks, setBorrowedBooks] = useState([])
+
+  const fetchBorrowedBooks = async (userId) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/transactions/user/${userId}/current`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch borrowed books')
+      }
+      const data = await response.json()
+      setBorrowedBooks(data)
+    } catch (error) {
+      console.error('Error fetching borrowed books:', error)
+    }
+  }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -43,6 +57,8 @@ export default function MemberDashboard() {
         const data = await response.json()
         console.log('Received user data:', data)
         setUserData(data)
+        
+        await fetchBorrowedBooks(data.id)
       } catch (error) {
         console.error('Error fetching user data:', error)
       } finally {
@@ -184,36 +200,18 @@ export default function MemberDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"1984" by George Orwell</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">Due in 2 days</Badge>
-                  <Button size="sm">Renew</Button>
-                </div>
-              </li>
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"The Great Gatsby" by F. Scott Fitzgerald</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">Due in 1 week</Badge>
-                  <Button size="sm">Renew</Button>
-                </div>
-              </li>
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"Pride and Prejudice" by Jane Austen</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">Due in 2 weeks</Badge>
-                  <Button size="sm">Renew</Button>
-                </div>
-              </li>
+              {borrowedBooks.map(book => (
+                <li key={book.transaction_id} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Book className="mr-2" />
+                    <span>{book.title} by {book.author}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">Due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days</Badge>
+                    <Button size="sm">Renew</Button>
+                  </div>
+                </li>
+              ))}
             </ul>
           </CardContent>
         </Card>

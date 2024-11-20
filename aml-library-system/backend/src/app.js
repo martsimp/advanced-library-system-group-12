@@ -1,6 +1,7 @@
 const express = require('express');
 const userRoutes = require('./services/user/userRoutes');
 const inventoryRoutes = require('./services/inventory/inventoryRoutes');
+const transactionsRoutes = require('./services/transactions/transactionsRoutes');
 const cors = require('cors');
 
 const app = express();
@@ -18,8 +19,9 @@ app.use(cors({
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
-//  Middl ware eror handling
+// Middleware error handling
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
