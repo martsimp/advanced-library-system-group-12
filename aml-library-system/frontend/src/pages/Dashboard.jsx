@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Book, Calendar, CheckCircle, Clock, Library, Search, User, Bell } from 'lucide-react'
+import { Book, Calendar, CheckCircle, Clock, Library, Search, User, Bell, Settings, LogOut } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card'
@@ -14,6 +14,10 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
 import { Badge } from '../components/ui/badge'
+import { signOut } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -33,6 +37,8 @@ export default function MemberDashboard() {
     currentYearBooks: [],
     lastYearCount: 0
   });
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   const calculateBorrowingStats = (books) => {
     const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
@@ -102,39 +108,36 @@ export default function MemberDashboard() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const firebaseUid = localStorage.getItem('firebaseUid')
-        console.log('Firebase UID from localStorage:', firebaseUid)
-
-        if (!firebaseUid) {
-          console.error('No firebase UID found')
-          return
+        if (!currentUser) {
+          console.error('No user authenticated');
+          return;
         }
 
-        const url = `${process.env.REACT_APP_API_URL}/api/users/${firebaseUid}`
-        console.log('Fetching from URL:', url)
+        const url = `${process.env.REACT_APP_API_URL}/api/users/${currentUser.uid}`;
+        console.log('Fetching from URL:', url);
 
-        const response = await fetch(url)
-        console.log('Response status:', response.status)
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch user data')
+          throw new Error('Failed to fetch user data');
         }
-        const data = await response.json()
-        console.log('Received user data:', data)
-        setUserData(data)
+        const data = await response.json();
+        console.log('Received user data:', data);
+        setUserData(data);
         
-        await fetchBorrowedBooks(data.id)
-        await fetchReservations(data.id)
-        await fetchReadingHistory(data.id)
+        await fetchBorrowedBooks(data.id);
+        await fetchReservations(data.id);
+        await fetchReadingHistory(data.id);
       } catch (error) {
-        console.error('Error fetching user data:', error)
+        console.error('Error fetching user data:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUserData()
-  }, [])
+    fetchUserData();
+  }, [currentUser]);
 
   // Replace the hardcoded welcome message
   const welcomeMessage = loading 
@@ -142,6 +145,15 @@ export default function MemberDashboard() {
     : userData 
     ? `Welcome, ${userData.name}` 
     : 'Welcome'
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // The PrivateRoute will automatically redirect to login
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -178,29 +190,63 @@ export default function MemberDashboard() {
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">{welcomeMessage}</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative z-50">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline"><Bell className="mr-2" />Notifications</Button>
+                <Button 
+                  variant="outline" 
+                  className="bg-white border-gray-200 hover:bg-gray-100"
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end" className="w-[300px]">
                 <DropdownMenuLabel>Recent Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>"1984" is due in 2 days</DropdownMenuItem>
-                <DropdownMenuItem>"To Kill a Mockingbird" reservation is ready</DropdownMenuItem>
-                <DropdownMenuItem>New arrivals in your favorite genre</DropdownMenuItem>
+                {borrowedBooks.length > 0 ? (
+                  borrowedBooks.map(book => (
+                    <DropdownMenuItem key={book.transaction_id}>
+                      <span className="text-sm">
+                        "{book.title}" is due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days
+                      </span>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled>No notifications</DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline"><User className="mr-2" />Account</Button>
+                <Button 
+                  variant="outline"
+                  className="bg-white border-gray-200 hover:bg-gray-100"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Account
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end" className="w-[200px]">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Log out</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="text-red-600 focus:text-red-600"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
