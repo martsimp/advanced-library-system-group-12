@@ -11,4 +11,4 @@ async function getUserReadingHistory(userId) {
 module.exports = {
     getUserCurrentBorrowings,
     getUserReadingHistory
-}; 
+};

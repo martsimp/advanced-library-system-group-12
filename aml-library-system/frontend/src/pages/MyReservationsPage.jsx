@@ -101,7 +101,7 @@ export default function MyReservationsPage() {
                         <p className="text-sm text-gray-500">by {reservation.author}</p>
                         <div className="mt-2">
                           <Badge variant="secondary">
-                            {reservation.status === 'ready' 
+                            {reservation.status === 'fulfilled' 
                               ? 'Ready for pickup' 
                               : `Queue position: ${reservation.queue_position}`}
                           </Badge>
@@ -109,7 +109,7 @@ export default function MyReservationsPage() {
                       </div>
                     </div>
                     <div className="mt-4 md:mt-0 flex items-center gap-2">
-                      {reservation.status === 'ready' ? (
+                      {reservation.status === 'fulfilled' ? (
                         <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                           Pickup
                         </Button>

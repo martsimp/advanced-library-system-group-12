@@ -60,7 +60,7 @@ export default function MemberDashboard() {
   const calculateReservationStats = (reservations) => {
     const stats = {
       totalReservations: reservations.length,
-      readyForPickup: reservations.filter(res => res.status === 'ready').length
+      readyForPickup: reservations.filter(res => res.status === 'fulfilled').length
     };
     setReservationStats(stats);
   };
@@ -161,10 +161,12 @@ export default function MemberDashboard() {
     }
   };
 
+  const MAX_DISPLAY_ITEMS = 2; // Number of items to show before "View More"
+  
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md">
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar - Add h-full to ensure full height */}
+      <aside className="w-64 bg-white shadow-md h-full fixed">
         <div className="p-4">
           <h2 className="text-2xl font-bold text-gray-800">AML Member</h2>
         </div>
@@ -192,8 +194,8 @@ export default function MemberDashboard() {
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+      {/* Main Content - Add margin-left to account for fixed sidebar */}
+      <main className="flex-1 p-8 ml-64">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">{welcomeMessage}</h1>
           <div className="flex items-center gap-4 relative z-50">
@@ -321,9 +323,18 @@ export default function MemberDashboard() {
 
         {/* Currently Borrowed Books */}
         <Card className="mt-6 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle>Currently Borrowed Books</CardTitle>
-            <CardDescription>Manage your current loans</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Currently Borrowed Books</CardTitle>
+              <CardDescription>Manage your current loans</CardDescription>
+            </div>
+            {borrowedBooks.length > MAX_DISPLAY_ITEMS && (
+              <Link to="/my-borrowings">
+                <Button variant="outline" size="sm">
+                  View All ({borrowedBooks.length})
+                </Button>
+              </Link>
+            )}
           </CardHeader>
           <CardContent>
             {borrowedBooks.length === 0 ? (
@@ -334,7 +345,7 @@ export default function MemberDashboard() {
               </div>
             ) : (
               <ul className="space-y-4">
-                {borrowedBooks.map(book => (
+                {borrowedBooks.slice(0, MAX_DISPLAY_ITEMS).map(book => (
                   <li key={book.transaction_id} className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Book className="mr-2" />
@@ -353,9 +364,18 @@ export default function MemberDashboard() {
 
         {/* Current Reservations */}
         <Card className="mt-6 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle>Current Reservations</CardTitle>
-            <CardDescription>Manage your reservations</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Current Reservations</CardTitle>
+              <CardDescription>Manage your reservations</CardDescription>
+            </div>
+            {reservations.length > MAX_DISPLAY_ITEMS && (
+              <Link to="/my-reservations">
+                <Button variant="outline" size="sm">
+                  View All ({reservations.length})
+                </Button>
+              </Link>
+            )}
           </CardHeader>
           <CardContent>
             {reservations.length === 0 ? (
@@ -366,7 +386,7 @@ export default function MemberDashboard() {
               </div>
             ) : (
               <ul className="space-y-4">
-                {reservations.map(reservation => (
+                {reservations.slice(0, MAX_DISPLAY_ITEMS).map(reservation => (
                   <li key={reservation.reservation_id} className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Book className="mr-2" />
@@ -374,10 +394,18 @@ export default function MemberDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">
-                        {reservation.status === 'ready' ? 'Ready for pickup' : `Queue position: ${reservation.queue_position}`}
+                        {reservation.status === 'fulfilled' 
+                            ? 'Ready for pickup' 
+                            : `Queue position: ${reservation.queue_position}`}
                       </Badge>
-                      {reservation.status === 'ready' && (
-                        <Button size="sm">Pickup</Button>
+                      {reservation.status === 'fulfilled' ? (
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                            Pickup
+                        </Button>
+                      ) : (
+                        <Button size="sm" variant="outline">
+                            Cancel Reservation
+                        </Button>
                       )}
                     </div>
                   </li>

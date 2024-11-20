@@ -9,16 +9,24 @@ async function getUserCurrentReservations(userId) {
             r.queue_position,
             m.title,
             m.author,
-            m.id as media_id
+            m.id as media_id,
+            b.name as branch_name
         FROM reservations r
         JOIN media m ON r.media_id = m.id
+        JOIN branches b ON r.branch_id = b.id
         WHERE r.user_id = $1 
-        AND r.status IN ('pending', 'ready')
+        AND r.status IN ('active', 'fulfilled')
         ORDER BY r.reserve_date ASC
     `;
     
-    const result = await db.query(query, [userId]);
-    return result.rows;
+    try {
+        const result = await db.query(query, [userId]);
+        console.log('Reservations query result:', result.rows); // Debug log
+        return result.rows;
+    } catch (error) {
+        console.error('Error in getUserCurrentReservations:', error);
+        throw error;
+    }
 }
 
 module.exports = {
