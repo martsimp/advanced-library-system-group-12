@@ -16,8 +16,9 @@ import {
 import { Badge } from '../components/ui/badge'
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { LoadingPage, Spinner } from '../components/ui/spinner';
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -139,6 +140,11 @@ export default function MemberDashboard() {
     fetchUserData();
   }, [currentUser]);
 
+  // If the initial loading is happening, show the full-page loader
+  if (loading) {
+    return <LoadingPage />;
+  }
+
   // Replace the hardcoded welcome message
   const welcomeMessage = loading 
     ? 'Loading...' 
@@ -163,10 +169,10 @@ export default function MemberDashboard() {
           <h2 className="text-2xl font-bold text-gray-800">AML Member</h2>
         </div>
         <nav className="mt-6">
-          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
+          <Link to="/catalog" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
             <Book className="inline-block mr-2" />
             Search Catalog
-          </a>
+          </Link>
           <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
             <CheckCircle className="inline-block mr-2" />
             My Borrowings
