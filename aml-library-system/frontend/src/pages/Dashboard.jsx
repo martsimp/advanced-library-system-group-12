@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Book, Calendar, CheckCircle, Clock, Library, Search, User, Bell } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -17,6 +17,48 @@ import { Badge } from '../components/ui/badge'
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const firebaseUid = localStorage.getItem('firebaseUid')
+        console.log('Firebase UID from localStorage:', firebaseUid)
+
+        if (!firebaseUid) {
+          console.error('No firebase UID found')
+          return
+        }
+
+        const url = `${process.env.REACT_APP_API_URL}/api/users/${firebaseUid}`
+        console.log('Fetching from URL:', url)
+
+        const response = await fetch(url)
+        console.log('Response status:', response.status)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data')
+        }
+        const data = await response.json()
+        console.log('Received user data:', data)
+        setUserData(data)
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [])
+
+  // Replace the hardcoded welcome message
+  const welcomeMessage = loading 
+    ? 'Loading...' 
+    : userData 
+    ? `Welcome, ${userData.name}` 
+    : 'Welcome'
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -52,7 +94,7 @@ export default function MemberDashboard() {
       {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Welcome, John Doe</h1>
+          <h1 className="text-3xl font-bold text-gray-800">{welcomeMessage}</h1>
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

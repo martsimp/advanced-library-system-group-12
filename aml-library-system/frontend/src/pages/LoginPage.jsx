@@ -26,8 +26,9 @@ export default function LoginPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
+      localStorage.setItem('firebaseUid', userCredential.user.uid);
       navigate('/dashboard');
     } catch (err) {
       console.error('Full Login error object:', err);

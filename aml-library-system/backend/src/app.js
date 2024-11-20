@@ -1,12 +1,19 @@
 const express = require('express');
 const userRoutes = require('./services/user/userRoutes');
 const inventoryRoutes = require('./services/inventory/inventoryRoutes');
+const cors = require('cors');
 
 const app = express();
 
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 
 // Routes
 app.use('/api/users', userRoutes);
