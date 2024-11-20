@@ -11,6 +11,18 @@ async function getUserCurrentBorrowings(req, res) {
     }
 }
 
+async function getUserReadingHistory(req, res) {
+    try {
+        const { userId } = req.params;
+        const history = await transactionsService.getUserReadingHistory(userId);
+        res.json(history);
+    } catch (error) {
+        console.error('Error fetching reading history:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
-    getUserCurrentBorrowings
+    getUserCurrentBorrowings,
+    getUserReadingHistory
 }; 

@@ -20,6 +20,43 @@ export default function MemberDashboard() {
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [borrowedBooks, setBorrowedBooks] = useState([])
+  const [borrowingStats, setBorrowingStats] = useState({
+    totalBorrowings: 0,
+    dueSoon: 0
+  });
+  const [reservations, setReservations] = useState([]);
+  const [reservationStats, setReservationStats] = useState({
+    totalReservations: 0,
+    readyForPickup: 0
+  });
+  const [readingHistory, setReadingHistory] = useState({
+    currentYearBooks: [],
+    lastYearCount: 0
+  });
+
+  const calculateBorrowingStats = (books) => {
+    const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    const now = new Date();
+    
+    const stats = {
+      totalBorrowings: books.length,
+      dueSoon: books.filter(book => {
+        const dueDate = new Date(book.due_date);
+        const timeUntilDue = dueDate - now;
+        return timeUntilDue > 0 && timeUntilDue <= oneWeek;
+      }).length
+    };
+
+    setBorrowingStats(stats);
+  };
+
+  const calculateReservationStats = (reservations) => {
+    const stats = {
+      totalReservations: reservations.length,
+      readyForPickup: reservations.filter(res => res.status === 'ready').length
+    };
+    setReservationStats(stats);
+  };
 
   const fetchBorrowedBooks = async (userId) => {
     try {
@@ -29,10 +66,38 @@ export default function MemberDashboard() {
       }
       const data = await response.json()
       setBorrowedBooks(data)
+      calculateBorrowingStats(data)
     } catch (error) {
       console.error('Error fetching borrowed books:', error)
     }
   }
+
+  const fetchReservations = async (userId) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations/user/${userId}/current`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch reservations');
+      }
+      const data = await response.json();
+      setReservations(data);
+      calculateReservationStats(data);
+    } catch (error) {
+      console.error('Error fetching reservations:', error);
+    }
+  };
+
+  const fetchReadingHistory = async (userId) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/transactions/user/${userId}/history`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch reading history');
+      }
+      const data = await response.json();
+      setReadingHistory(data);
+    } catch (error) {
+      console.error('Error fetching reading history:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -59,6 +124,8 @@ export default function MemberDashboard() {
         setUserData(data)
         
         await fetchBorrowedBooks(data.id)
+        await fetchReservations(data.id)
+        await fetchReadingHistory(data.id)
       } catch (error) {
         console.error('Error fetching user data:', error)
       } finally {
@@ -164,8 +231,10 @@ export default function MemberDashboard() {
               <CardDescription>Books you currently have checked out</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-blue-600">3</p>
-              <p className="text-sm text-gray-500 mt-2">2 due within a week</p>
+              <p className="text-4xl font-bold text-blue-600">{borrowingStats.totalBorrowings}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {borrowingStats.dueSoon} due within a week
+              </p>
             </CardContent>
           </Card>
 
@@ -175,8 +244,8 @@ export default function MemberDashboard() {
               <CardDescription>Books you've reserved</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-blue-600">2</p>
-              <p className="text-sm text-gray-500 mt-2">1 ready for pickup</p>
+              <p className="text-4xl font-bold text-blue-600">{reservationStats.totalReservations}</p>
+              <p className="text-sm text-gray-500 mt-2">{reservationStats.readyForPickup} ready for pickup</p>
             </CardContent>
           </Card>
 
@@ -186,8 +255,14 @@ export default function MemberDashboard() {
               <CardDescription>Books you've read this year</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-blue-600">17</p>
-              <p className="text-sm text-gray-500 mt-2">5 more than last year</p>
+              <p className="text-4xl font-bold text-blue-600">{readingHistory.currentYearBooks.length}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {readingHistory.currentYearBooks.length > readingHistory.lastYearCount
+                  ? `${readingHistory.currentYearBooks.length - readingHistory.lastYearCount} more than last year`
+                  : readingHistory.currentYearBooks.length < readingHistory.lastYearCount
+                  ? `${readingHistory.lastYearCount - readingHistory.currentYearBooks.length} less than last year`
+                  : 'Same as last year'}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -199,53 +274,95 @@ export default function MemberDashboard() {
             <CardDescription>Manage your current loans</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {borrowedBooks.map(book => (
-                <li key={book.transaction_id} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Book className="mr-2" />
-                    <span>{book.title} by {book.author}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">Due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days</Badge>
-                    <Button size="sm">Renew</Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {borrowedBooks.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                <Book className="mx-auto h-12 w-12 opacity-30 mb-2" />
+                <p>You don't have any books checked out</p>
+                <p className="text-sm mt-1">Visit our catalog to find your next read!</p>
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {borrowedBooks.map(book => (
+                  <li key={book.transaction_id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Book className="mr-2" />
+                      <span>{book.title} by {book.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">Due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days</Badge>
+                      <Button size="sm">Renew</Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
 
-        {/* Recommended Books */}
+        {/* Current Reservations */}
         <Card className="mt-6 bg-white shadow-lg">
           <CardHeader>
-            <CardTitle>Recommended for You</CardTitle>
-            <CardDescription>Based on your reading history</CardDescription>
+            <CardTitle>Current Reservations</CardTitle>
+            <CardDescription>Manage your reservations</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"Brave New World" by Aldous Huxley</span>
-                </div>
-                <Button size="sm">Reserve</Button>
-              </li>
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"To Kill a Mockingbird" by Harper Lee</span>
-                </div>
-                <Button size="sm">Reserve</Button>
-              </li>
-              <li className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Book className="mr-2" />
-                  <span>"The Catcher in the Rye" by J.D. Salinger</span>
-                </div>
-                <Button size="sm">Reserve</Button>
-              </li>
-            </ul>
+            {reservations.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                <Clock className="mx-auto h-12 w-12 opacity-30 mb-2" />
+                <p>You don't have any active reservations</p>
+                <p className="text-sm mt-1">Reserve books from our catalog to see them here</p>
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {reservations.map(reservation => (
+                  <li key={reservation.reservation_id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Book className="mr-2" />
+                      <span>{reservation.title} by {reservation.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        {reservation.status === 'ready' ? 'Ready for pickup' : `Queue position: ${reservation.queue_position}`}
+                      </Badge>
+                      {reservation.status === 'ready' && (
+                        <Button size="sm">Pickup</Button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Reading History */}
+        <Card className="mt-6 bg-white shadow-lg">
+          <CardHeader>
+            <CardTitle>Reading History</CardTitle>
+            <CardDescription>Books you've completed this year</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {readingHistory.currentYearBooks.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                <Book className="mx-auto h-12 w-12 opacity-30 mb-2" />
+                <p>No books completed this year yet</p>
+                <p className="text-sm mt-1">Your finished books will appear here</p>
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {readingHistory.currentYearBooks.map(book => (
+                  <li key={book.transaction_id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Book className="mr-2" />
+                      <span>{book.title} by {book.author}</span>
+                    </div>
+                    <Badge variant="secondary">
+                      Completed {new Date(book.return_date).toLocaleDateString()}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </main>
