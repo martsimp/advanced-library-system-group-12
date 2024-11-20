@@ -98,6 +98,99 @@ async function fulfillReservation(id) {
     await db.query(sql);
 }
 
+async function searchMedia({ searchQuery, genre, format, status, sortBy }) {
+    let query = `
+        SELECT 
+            m.id,
+            m.title,
+            m.author,
+            m.genre,
+            m.publication_year,
+            m.format,
+            m.status,
+            m.description,
+            m.total_copies
+        FROM media m
+        WHERE 1=1
+    `;
+    
+    const params = [];
+    let paramCount = 1;
+
+    // Search query for title, author, or description
+    if (searchQuery) {
+        query += ` AND (
+            LOWER(m.title) LIKE LOWER($${paramCount}) OR 
+            LOWER(m.author) LIKE LOWER($${paramCount}) OR 
+            LOWER(m.description) LIKE LOWER($${paramCount})
+        )`;
+        params.push(`%${searchQuery}%`);
+        paramCount++;
+    }
+
+    // Genre filter
+    if (genre && genre !== 'all') {
+        query += ` AND LOWER(m.genre) = LOWER($${paramCount})`;
+        params.push(genre);
+        paramCount++;
+    }
+
+    // Format filter
+    if (format && format !== 'all') {
+        query += ` AND LOWER(m.format) = LOWER($${paramCount})`;
+        params.push(format);
+        paramCount++;
+    }
+
+    // Status filter
+    if (status && status !== 'all') {
+        query += ` AND LOWER(m.status) = LOWER($${paramCount})`;
+        params.push(status);
+        paramCount++;
+    }
+
+    // Sorting
+    switch (sortBy) {
+        case 'title':
+            query += ` ORDER BY m.title ASC`;
+            break;
+        case 'author':
+            query += ` ORDER BY m.author ASC`;
+            break;
+        case 'publication_year':
+            query += ` ORDER BY m.publication_year DESC`;
+            break;
+        default:
+            query += ` ORDER BY m.title ASC`;
+    }
+
+    try {
+        const result = await db.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Error in searchMedia:', error);
+        throw error;
+    }
+}
+
+// Get distinct values for filters
+async function getFilterOptions() {
+    try {
+        const genres = await db.query('SELECT DISTINCT genre FROM media ORDER BY genre');
+        const formats = await db.query('SELECT DISTINCT format FROM media ORDER BY format');
+        const statuses = await db.query('SELECT DISTINCT status FROM media ORDER BY status');
+
+        return {
+            genres: genres.rows.map(row => row.genre),
+            formats: formats.rows.map(row => row.format),
+            statuses: statuses.rows.map(row => row.status)
+        };
+    } catch (error) {
+        console.error('Error getting filter options:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     getAllMedia,
     createMedia,
@@ -107,4 +200,6 @@ module.exports = {
     createReservation,
     deleteReservation,
     fulfillReservation,
+    searchMedia,
+    getFilterOptions
 };

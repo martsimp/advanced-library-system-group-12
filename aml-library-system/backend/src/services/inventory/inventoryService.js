@@ -32,6 +32,14 @@ async function fulfillReservation(id) {
     return await inventoryRepository.fulfillReservation(id);
 }
 
+async function searchMedia(searchParams) {
+    return await inventoryRepository.searchMedia(searchParams);
+}
+
+async function getFilterOptions() {
+    return await inventoryRepository.getFilterOptions();
+}
+
 module.exports = {
     getAllMedia,
     createMedia,
@@ -40,5 +48,7 @@ module.exports = {
     getReservations,
     createReservation,
     deleteReservation,
-    fulfillReservation
+    fulfillReservation,
+    searchMedia,
+    getFilterOptions
 };

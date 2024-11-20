@@ -22,7 +22,7 @@ app.use('/api/reservations', reservationsRoutes);
 
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+    res.status(500).json({ error: err.message });
 });
 
 module.exports = app; 

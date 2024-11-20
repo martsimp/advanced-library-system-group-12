@@ -82,6 +82,34 @@ async function deleteReservation(req, res) {
     }
 }
 
+async function searchMedia(req, res) {
+    try {
+        const searchParams = {
+            searchQuery: req.query.q,
+            genre: req.query.genre,
+            format: req.query.format,
+            status: req.query.status,
+            sortBy: req.query.sortBy
+        };
+        
+        const results = await inventoryService.searchMedia(searchParams);
+        res.json(results);
+    } catch (error) {
+        console.error('Error searching media:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function getFilterOptions(req, res) {
+    try {
+        const options = await inventoryService.getFilterOptions();
+        res.json(options);
+    } catch (error) {
+        console.error('Error getting filter options:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getAllMedia,
     getMediaById,
@@ -92,4 +120,6 @@ module.exports = {
     createReservation,
     fulfillReservation,
     deleteReservation,
+    searchMedia,
+    getFilterOptions
 };
