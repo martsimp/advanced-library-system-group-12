@@ -173,14 +173,14 @@ export default function MemberDashboard() {
             <Book className="inline-block mr-2" />
             Search Catalog
           </Link>
-          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
+          <Link to="/my-borrowings" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
             <CheckCircle className="inline-block mr-2" />
             My Borrowings
-          </a>
-          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
+          </Link>
+          <Link to="/my-reservations" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
             <Clock className="inline-block mr-2" />
             My Reservations
-          </a>
+          </Link>
           <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
             <Calendar className="inline-block mr-2" />
             Reading History

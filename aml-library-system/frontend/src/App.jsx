@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import CatalogPage from './pages/CatalogPage';
+import MyBorrowingsPage from './pages/MyBorrowingsPage';
+import MyReservationsPage from './pages/MyReservationsPage';
 
 function App() {
   return (
@@ -26,6 +28,22 @@ function App() {
             element={
               <PrivateRoute>
                 <CatalogPage />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/my-borrowings" 
+            element={
+              <PrivateRoute>
+                <MyBorrowingsPage />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/my-reservations" 
+            element={
+              <PrivateRoute>
+                <MyReservationsPage />
               </PrivateRoute>
             } 
           />
