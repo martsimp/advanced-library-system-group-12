@@ -205,6 +205,12 @@ export default function MemberDashboard() {
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Redirect to catalog page with search query as URL parameter
+    navigate(`/catalog?q=${encodeURIComponent(searchQuery)}`);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar - Add h-full to ensure full height */}
@@ -303,21 +309,21 @@ export default function MemberDashboard() {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
-          <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex gap-2">
             <Input
               type="text"
-              placeholder="Search for books, authors, or genres..."
+              placeholder="Search the catalog..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-grow bg-white"
             />
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Search className="mr-2" />
+              <Search className="h-4 w-4 mr-2" />
               Search
             </Button>
-          </form>
-        </div>
+          </div>
+        </form>
 
         {/* Member Dashboard Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

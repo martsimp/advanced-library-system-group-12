@@ -59,12 +59,23 @@ export default function CatalogPage() {
     fetchFilterOptions();
   }, []);
 
-  // Search function
-  const searchBooks = async () => {
+  // Get search query from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryParam = params.get('q');
+    if (queryParam) {
+      setSearchQuery(queryParam);
+      // Trigger search immediately with the query parameter
+      searchBooks(queryParam);
+    }
+  }, []);
+
+  // Updated search function to accept optional query parameter
+  const searchBooks = async (queryOverride = null) => {
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
-        q: searchQuery,
+        q: queryOverride ?? searchQuery,
         genre: filters.genre,
         format: filters.format,
         status: filters.status,
