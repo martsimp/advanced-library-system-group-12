@@ -12,11 +12,14 @@ import {
 } from '../components/ui/Card';
 import { Badge } from '../components/ui/badge';
 import { LoadingPage } from '../components/ui/spinner';
+import { CancelReservationModal } from '../components/CancelReservationModal';
 
 export default function MyReservationsPage() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -45,6 +48,34 @@ export default function MyReservationsPage() {
       fetchReservations();
     }
   }, [currentUser]);
+
+  const handleCancelReservation = async (reservationId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/reservations/${reservationId}/cancel`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel reservation');
+      }
+
+      // Remove the cancelled reservation from the state
+      setReservations(prevReservations => 
+        prevReservations.filter(res => res.reservation_id !== reservationId)
+      );
+    } catch (error) {
+      console.error('Error cancelling reservation:', error);
+      // You might want to show an error message to the user here
+    }
+  };
+
+  const handleCancelClick = (reservation) => {
+    setSelectedReservation(reservation);
+    setIsCancelModalOpen(true);
+  };
 
   if (loading) {
     return <LoadingPage />;
@@ -114,7 +145,11 @@ export default function MyReservationsPage() {
                           Pickup
                         </Button>
                       ) : (
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleCancelClick(reservation)}
+                        >
                           Cancel Reservation
                         </Button>
                       )}
@@ -126,6 +161,18 @@ export default function MyReservationsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {selectedReservation && (
+        <CancelReservationModal
+          reservation={selectedReservation}
+          isOpen={isCancelModalOpen}
+          onClose={() => {
+            setIsCancelModalOpen(false);
+            setSelectedReservation(null);
+          }}
+          onConfirm={handleCancelReservation}
+        />
+      )}
     </div>
   );
 } 

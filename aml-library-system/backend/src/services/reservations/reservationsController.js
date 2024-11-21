@@ -13,6 +13,18 @@ async function getUserCurrentReservations(req, res) {
     }
 }
 
+async function cancelReservation(req, res) {
+    try {
+        const { reservationId } = req.params;
+        await reservationsService.cancelReservation(reservationId);
+        res.status(200).json({ message: 'Reservation cancelled successfully' });
+    } catch (error) {
+        console.error('Error cancelling reservation:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
-    getUserCurrentReservations
+    getUserCurrentReservations,
+    cancelReservation
 }; 

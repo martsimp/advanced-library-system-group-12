@@ -20,6 +20,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingPage, Spinner } from '../components/ui/spinner';
 import { RenewalModal } from '../components/RenewalModal';
+import { CancelReservationModal } from '../components/CancelReservationModal';
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -41,6 +42,8 @@ export default function MemberDashboard() {
   });
   const [selectedBook, setSelectedBook] = useState(null);
   const [isRenewalModalOpen, setIsRenewalModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
@@ -179,6 +182,27 @@ export default function MemberDashboard() {
           : book
       )
     );
+  };
+
+  const handleCancelReservation = async (reservationId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/reservations/${reservationId}/cancel`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel reservation');
+      }
+
+      setReservations(prevReservations => 
+        prevReservations.filter(res => res.reservation_id !== reservationId)
+      );
+    } catch (error) {
+      console.error('Error cancelling reservation:', error);
+    }
   };
 
   return (
@@ -428,8 +452,15 @@ export default function MemberDashboard() {
                             Pickup
                         </Button>
                       ) : (
-                        <Button size="sm" variant="outline">
-                            Cancel Reservation
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedReservation(reservation);
+                            setIsCancelModalOpen(true);
+                          }}
+                        >
+                          Cancel Reservation
                         </Button>
                       )}
                     </div>
@@ -481,6 +512,18 @@ export default function MemberDashboard() {
               setSelectedBook(null);
             }}
             onRenew={handleRenewalComplete}
+          />
+        )}
+
+        {selectedReservation && (
+          <CancelReservationModal
+            reservation={selectedReservation}
+            isOpen={isCancelModalOpen}
+            onClose={() => {
+              setIsCancelModalOpen(false);
+              setSelectedReservation(null);
+            }}
+            onConfirm={handleCancelReservation}
           />
         )}
       </main>

@@ -29,6 +29,37 @@ async function getUserCurrentReservations(userId) {
     }
 }
 
+async function cancelReservation(reservationId) {
+    const query = `
+        DELETE FROM reservations 
+        WHERE id = $1 
+        AND status = 'active'
+        RETURNING media_id, branch_id
+    `;
+    
+    const result = await db.query(query, [reservationId]);
+    
+    // If there was a reservation deleted, update queue positions for remaining reservations
+    if (result.rows.length > 0) {
+        const { media_id, branch_id } = result.rows[0];
+        
+        // Update queue positions for remaining active reservations
+        const updateQuery = `
+            UPDATE reservations 
+            SET queue_position = queue_position - 1
+            WHERE media_id = $1 
+            AND branch_id = $2
+            AND status = 'active'
+            AND queue_position > 0
+        `;
+        
+        await db.query(updateQuery, [media_id, branch_id]);
+    }
+    
+    return result.rows[0];
+}
+
 module.exports = {
-    getUserCurrentReservations
+    getUserCurrentReservations,
+    cancelReservation
 }; 

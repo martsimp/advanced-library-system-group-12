@@ -10,6 +10,11 @@ async function getUserCurrentReservations(userId) {
     }
 }
 
+async function cancelReservation(reservationId) {
+    return await reservationsRepository.cancelReservation(reservationId);
+}
+
 module.exports = {
-    getUserCurrentReservations
+    getUserCurrentReservations,
+    cancelReservation
 }; 
