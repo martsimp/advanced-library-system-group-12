@@ -19,6 +19,7 @@ import { auth } from '../config/firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingPage, Spinner } from '../components/ui/spinner';
+import { RenewalModal } from '../components/RenewalModal';
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -38,6 +39,8 @@ export default function MemberDashboard() {
     currentYearBooks: [],
     lastYearCount: 0
   });
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isRenewalModalOpen, setIsRenewalModalOpen] = useState(false);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
@@ -163,6 +166,21 @@ export default function MemberDashboard() {
 
   const MAX_DISPLAY_ITEMS = 2; // Number of items to show before "View More"
   
+  const handleRenewalClick = (book) => {
+    setSelectedBook(book);
+    setIsRenewalModalOpen(true);
+  };
+
+  const handleRenewalComplete = (transactionId, newDueDate) => {
+    setBorrowedBooks(books => 
+      books.map(book => 
+        book.transaction_id === transactionId 
+          ? { ...book, due_date: newDueDate }
+          : book
+      )
+    );
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar - Add h-full to ensure full height */}
@@ -352,8 +370,15 @@ export default function MemberDashboard() {
                       <span>{book.title} by {book.author}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary">Due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days</Badge>
-                      <Button size="sm">Renew</Button>
+                      <Badge variant="secondary">
+                        Due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days
+                      </Badge>
+                      <Button 
+                        size="sm"
+                        onClick={() => handleRenewalClick(book)}
+                      >
+                        Renew
+                      </Button>
                     </div>
                   </li>
                 ))}
@@ -445,6 +470,19 @@ export default function MemberDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* RenewalModal */}
+        {selectedBook && (
+          <RenewalModal
+            book={selectedBook}
+            isOpen={isRenewalModalOpen}
+            onClose={() => {
+              setIsRenewalModalOpen(false);
+              setSelectedBook(null);
+            }}
+            onRenew={handleRenewalComplete}
+          />
+        )}
       </main>
     </div>
   )
