@@ -18,4 +18,3 @@ router.post('/addMedia', controller.addMediaToBranch);
 router.get('/mediaInfo/:mediaName', controller.getMediaInfo);
 
 module.exports = router;
-//routes.js

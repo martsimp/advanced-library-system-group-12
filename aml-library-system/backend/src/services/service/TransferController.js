@@ -93,4 +93,3 @@ module.exports = {
   addMediaToBranch,
   getMediaInfo
 };
-//Controller.js
