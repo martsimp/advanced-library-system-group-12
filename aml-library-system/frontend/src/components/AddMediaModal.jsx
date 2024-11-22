@@ -18,7 +18,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
 
   const fetchMediaInfo = async (name) => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/mediaTransfer/mediaInfo/${encodeURIComponent(name)}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/mediaInfo/${encodeURIComponent(name)}`);
       setAvailableQuantity(response.data.total_copies);
       setMediaError('');
     } catch (error) {
