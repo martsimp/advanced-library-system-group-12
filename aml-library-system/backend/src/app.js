@@ -3,6 +3,7 @@ const userRoutes = require('./services/user/userRoutes');
 const inventoryRoutes = require('./services/inventory/inventoryRoutes');
 const transactionsRoutes = require('./services/transactions/transactionsRoutes');
 const reservationsRoutes = require('./services/reservations/reservationsRoutes');
+const mediaTransferRoutes = require('./services/mediaTransfer/TransferRoutes'); 
 const cors = require('cors');
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/reservations', reservationsRoutes);
+app.use('/api/mediaTransfer', mediaTransferRoutes);
 
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);

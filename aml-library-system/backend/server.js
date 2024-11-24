@@ -8,6 +8,7 @@ const userRoutes = require('./src/services/user/userRoutes');
 const inventoryRoutes = require('./src/services/inventory/inventoryRoutes');
 const transactionsRoutes = require('./src/services/transactions/transactionsRoutes');
 const reservationsRoutes = require('./src/services/reservations/reservationsRoutes');
+const mediaTransferRoutes = require('./src/services/mediaTransfer/TransferRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/reservations', reservationsRoutes);
+app.use('/api/mediaTransfer', mediaTransferRoutes);
 
 // Test for the DB
 app.get('/test-db', async (req, res) => {
