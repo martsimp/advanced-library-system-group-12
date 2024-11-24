@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import CatalogPage from './pages/CatalogPage';
 import MyBorrowingsPage from './pages/MyBorrowingsPage';
 import MyReservationsPage from './pages/MyReservationsPage';
+import TransferPage from './pages/TransferPage'
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
             element={
               <PrivateRoute>
                 <MyReservationsPage />
+              </PrivateRoute>
+            } 
+          />
+           <Route 
+            path="/transfer" 
+            element={
+              <PrivateRoute>
+                <TransferPage />
               </PrivateRoute>
             } 
           />

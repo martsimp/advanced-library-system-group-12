@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import MediaTable from '../components/ui/MediaTable';
-import AddMediaModal from '../components/ui/AddMediaModal';
+import MediaTable from '../components/MediaTable';
+import AddMediaModal from '../components/AddMediaModal';
 import axios from 'axios';
 import { BiTransfer } from 'react-icons/bi';
 import { FaBoxes } from 'react-icons/fa';
