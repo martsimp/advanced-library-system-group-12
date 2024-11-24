@@ -6,7 +6,7 @@ const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
   const [branchError, setBranchError] = useState('');
   const [quantityError, setQuantityError] = useState('');
 
-  if (!show) return null; // Hide modal if 'show' is false
+  if (!show) return null; 
 
   // Validate form before transferring
   const handleTransfer = () => {

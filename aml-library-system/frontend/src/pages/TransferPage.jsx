@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MediaTable from '../components/MediaTable';
 import AddMediaModal from '../components/AddMediaModal';
-import axios from 'axios';
 import { BiTransfer } from 'react-icons/bi';
 import { FaBoxes } from 'react-icons/fa';
 import { HiOutlineHome } from 'react-icons/hi';
+import { Button } from '../components/ui/Button';
 
 const TransferPage = () => {
   const [mediaList, setMediaList] = useState([]);
@@ -18,7 +18,6 @@ const TransferPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-// Handles user logout by redirecting to the login page
   const handleLogout = () => {
     navigate('/login');
   };
@@ -27,20 +26,28 @@ const TransferPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/media`);
-        setBranches(response.data.branches);
-        setCurrentBranch(response.data.branches[0]);
-        setMediaList(response.data.media);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/media`);
+        const data = await response.json();
+        setBranches(data.branches);
+        const firstBranch = data.branches[0];
+        setCurrentBranch(firstBranch);
+  
+        if (firstBranch) {
+          const mediaResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${firstBranch.id}`);
+          const mediaData = await mediaResponse.json();
+          setMediaList(mediaData.media);
+        }
+  
         setIsLoading(false);
       } catch (err) {
         setError('Failed to fetch data');
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
-
+  
   // Updates the media list when a different branch is selected
   const handleBranchChange = async (branch) => {
     if (!branch.id) {
@@ -49,10 +56,11 @@ const TransferPage = () => {
     }
     setCurrentBranch(branch);
     setIsLoading(true);
-    
+
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${branch.id}`);
-      setMediaList(response.data.media);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${branch.id}`);
+      const data = await response.json();
+      setMediaList(data.media);
       setIsLoading(false);
     } catch (err) {
       setError('Failed to fetch branch data');
@@ -68,14 +76,28 @@ const TransferPage = () => {
     }
     try {
       const branchId = Number(toBranchId);
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/transfer`, {
+      const requestData = {
         mediaId,
         fromBranchId: currentBranch.id,
         toBranchId: branchId,
         quantity,
+      };
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/transfer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
       });
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${currentBranch.id}`);
-      setMediaList(response.data.media); 
+
+      if (!response.ok) {
+        throw new Error('Failed to transfer media');
+      }
+
+      const updatedResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${currentBranch.id}`);
+      const updatedData = await updatedResponse.json();
+      setMediaList(updatedData.media);
     } catch (err) {
       setError('Failed to transfer media');
     }
@@ -87,17 +109,29 @@ const TransferPage = () => {
       const requestData = {
         mediaName,
         quantity,
-        branchName
+        branchName,
       };
-      console.log('Sending add media request:', requestData);
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/addMedia`, requestData);
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/addMedia`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add media');
+      }
+
       // Refresh the media list after adding
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${currentBranch.id}`);
-      setMediaList(response.data.media);
+      const updatedResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/branch/${currentBranch.id}`);
+      const updatedData = await updatedResponse.json();
+      setMediaList(updatedData.media);
       setShowAddModal(false);
     } catch (err) {
-      console.error('Failed to add media:', err.response ? err.response.data : err.message);
-      setError(err.response ? err.response.data.error : 'Failed to add media');
+      console.error('Failed to add media:', err.message);
+      setError(err.message);
     }
   };
 
@@ -150,17 +184,17 @@ const TransferPage = () => {
             ))}
           </div>
 
-            {/* Media inventory header and Add Media button */}
+          {/* Media inventory header and Add Media button */}
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-xl font-bold">Media Inventory</h4>
-            <button onClick={() => setShowAddModal(true)} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+            <Button onClick={() => setShowAddModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
               Add Media
-            </button>
+            </Button>
           </div>
 
           {/* Media table component */}
           <MediaTable
-            mediaList={mediaList}  
+            mediaList={mediaList}
             branches={branches.filter(b => b.id !== currentBranch.id)}
             onTransfer={handleTransfer}
             currentBranch={currentBranch}
@@ -182,4 +216,3 @@ const TransferPage = () => {
 };
 
 export default TransferPage;
-

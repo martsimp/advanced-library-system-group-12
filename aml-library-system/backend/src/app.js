@@ -4,6 +4,7 @@ const inventoryRoutes = require('./services/inventory/inventoryRoutes');
 const transactionsRoutes = require('./services/transactions/transactionsRoutes');
 const reservationsRoutes = require('./services/reservations/reservationsRoutes');
 const mediaTransferRoutes = require('./services/mediaTransfer/TransferRoutes'); 
+
 const cors = require('cors');
 
 const app = express();
