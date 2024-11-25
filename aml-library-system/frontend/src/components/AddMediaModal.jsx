@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -12,27 +11,38 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
 
   useEffect(() => {
     if (mediaName) {
-      fetchMediaInfo(mediaName);
+      fetchMediaInfo(mediaName); 
     }
   }, [mediaName]);
 
+  // Function to fetch media information based on media name
   const fetchMediaInfo = async (name) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/mediaInfo/${encodeURIComponent(name)}`);
-      setAvailableQuantity(response.data.total_copies);
-      setMediaError('');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/mediaTransfer/mediaInfo/${encodeURIComponent(name)}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableQuantity(data.total_copies); 
+        setMediaError(''); 
+      } else {
+        setMediaError('Media not found'); 
+        setAvailableQuantity(0); 
+      }
     } catch (error) {
-      console.error('Error fetching media info:', error);
-      setMediaError('Media not found');
+      console.error('Error fetching media info:', error); 
+      setMediaError('Error fetching media information');
       setAvailableQuantity(0);
     }
   };
 
+
   if (!isOpen) return null;
 
+  // Handle the button for Add Media
   const handleAdd = async () => {
     let hasError = false;
 
+    // Validation for branch selection
     if (!selectedBranch) {
       setBranchError('Please select a branch.');
       hasError = true;
@@ -40,6 +50,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
       setBranchError('');
     }
 
+    // Validation for quantity input
     if (quantity <= 0 || quantity > availableQuantity) {
       setQuantityError(`Quantity must be between 1 and ${availableQuantity}.`);
       hasError = true;
@@ -47,6 +58,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
       setQuantityError('');
     }
 
+    // Validation for media name
     if (!mediaName.trim()) {
       setMediaError('Please enter a media name.');
       hasError = true;
@@ -54,6 +66,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
       setMediaError('');
     }
 
+    // If no errors, proceed to add the media
     if (!hasError) {
       try {
         console.log('Attempting to add media:', { mediaName, quantity, branchName: selectedBranch });
@@ -61,10 +74,9 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
         setMediaName('');
         setQuantity(1);
         setSelectedBranch('');
-        onClose();
+        onClose(); 
       } catch (error) {
-        console.error('Error adding media:', error);
-        // Handle error (e.g., show error message to user)
+        console.error('Error adding media:', error); 
       }
     }
   };
@@ -74,6 +86,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
       <div className="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 className="text-xl font-semibold mb-4">Add Media</h2>
         <div className="border px-3 py-2">
+          {/* Media Name Input */}
           <div className="mb-4">
             <label className="block mb-2">Media Name:</label>
             <input
@@ -85,6 +98,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
             {mediaError && <p className="text-red-500 text-sm">{mediaError}</p>}
           </div>
 
+          {/* Quantity Input */}
           <div className="mb-4">
             <label className="block mb-2">Quantity (Available: {availableQuantity}):</label>
             <input
@@ -92,17 +106,18 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
               min="1"
               max={availableQuantity}
               value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+              onChange={(e) => setQuantity(parseInt(e.target.value, 10))} 
               className={`w-full border rounded px-3 py-2 ${quantityError ? 'border-red-500' : 'border-gray-300'}`}
             />
             {quantityError && <p className="text-red-500 text-sm">{quantityError}</p>}
           </div>
 
+          {/* Branch Selection */}
           <div className="mb-4">
             <label className="block mb-2">Select Branch:</label>
             <select
               value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
+              onChange={(e) => setSelectedBranch(e.target.value)} 
               className={`w-full border rounded px-3 py-2 ${branchError ? 'border-red-500' : 'border-gray-300'}`}
             >
               <option value="">--Select Branch--</option>
@@ -115,9 +130,10 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
             {branchError && <p className="text-red-500 text-sm">{branchError}</p>}
           </div>
 
+          {/* Modal Action Buttons */}
           <div className="flex justify-end gap-2">
             <button
-              onClick={onClose}
+              onClick={onClose} 
               className="px-4 py-2 bg-gray-300 rounded"
             >
               Cancel
@@ -136,4 +152,3 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
 };
 
 export default AddMediaModal;
-
