@@ -26,6 +26,8 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { LoadingPage } from '../components/ui/spinner';
+import {useAuth} from "../contexts/AuthContext";
+import {SelectBranchModal} from "../components/SelectBranchModal";
 
 export default function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +44,10 @@ export default function CatalogPage() {
     formats: [],
     statuses: []
   });
+  const { currentUser } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+  const [branches, setBranches] = useState([]);
+  const [mediaId, setMediaId] = useState("");
 
   // Fetch filter options on component mount
   useEffect(() => {
@@ -70,6 +76,21 @@ export default function CatalogPage() {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchBranches = async() => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/branches`);
+        if (!response.ok) throw new Error('Failed to fetch branches');
+        const data = await response.json();
+        setBranches(data);
+      } catch (error) {
+        console.error('Error fetching branches:', error);
+      }
+    }
+
+    fetchBranches();
+  }, []);
+
   // Updated search function to accept optional query parameter
   const searchBooks = async (queryOverride = null) => {
     try {
@@ -91,6 +112,41 @@ export default function CatalogPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCreateReservation = () => {
+    setShowModal(true);
+  }
+
+  const handleCreateReservationSubmit = async (branchId) => {
+    try {
+      let formData = new URLSearchParams();
+      formData.append('user', currentUser.uid);
+      formData.append('media_id', mediaId);
+      formData.append('branch_id', branchId);
+
+      const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/inventory/reservations/create`,
+          {
+            method: 'POST',
+            body: formData,
+          }
+      );
+
+      setShowModal(false);
+
+      if (!response.ok) {
+        throw new Error('Failed to create reservation');
+      }
+
+      return response.json()['id'];
+    } catch (error) {
+      console.error('Error cancelling reservation:', error);
+    }
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   // Initial search on component mount and filter changes
@@ -256,8 +312,13 @@ export default function CatalogPage() {
                           <Button 
                             size="sm" 
                             variant={book.status === 'available' ? 'default' : 'outline'}
-                            disabled={book.status !== 'available'}
                             className={book.status === 'available' ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}
+                            onClick={() => {
+                              if (book.status !== 'available') {
+                                setMediaId(book.id);
+                                handleCreateReservation()
+                              }
+                            }}
                           >
                             {book.status === 'available' ? 'Borrow' : 'Reserve'}
                           </Button>
@@ -271,6 +332,7 @@ export default function CatalogPage() {
           </CardContent>
         </Card>
       </div>
+      <SelectBranchModal show={showModal} branches={branches} onClose={handleCloseModal} onSelectBranch={handleCreateReservationSubmit}></SelectBranchModal>
     </div>
   );
 } 

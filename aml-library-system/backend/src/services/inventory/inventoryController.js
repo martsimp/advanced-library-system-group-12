@@ -60,6 +60,7 @@ async function createReservation(req, res) {
         const result = await inventoryService.createReservation(req.body);
         res.json(result);
     } catch (error) {
+        throw error;
         res.status(500).json({ error: error.message });
     }
 }
