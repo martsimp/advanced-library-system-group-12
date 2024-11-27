@@ -126,7 +126,7 @@ export default function CatalogPage() {
       formData.append('branch_id', branchId);
 
       const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/inventory/reservations/create`,
+          `${process.env.REACT_APP_API_URL}/api/reservations/create`,
           {
             method: 'POST',
             body: formData,

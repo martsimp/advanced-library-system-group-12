@@ -55,16 +55,6 @@ async function getReservations(req, res) {
     }
 }
 
-async function createReservation(req, res) {
-    try {
-        const result = await inventoryService.createReservation(req.body);
-        res.json(result);
-    } catch (error) {
-        throw error;
-        res.status(500).json({ error: error.message });
-    }
-}
-
 async function fulfillReservation(req, res) {
     try {
         await inventoryService.fulfillReservation(req.params.id);
@@ -118,7 +108,6 @@ module.exports = {
     updateMedia,
     deleteMedia,
     getReservations,
-    createReservation,
     fulfillReservation,
     deleteReservation,
     searchMedia,

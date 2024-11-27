@@ -11,6 +11,5 @@ router.get('/:id', inventoryController.getMediaById);
 router.post('/:id/update', inventoryController.updateMedia);
 router.post('/:id/delete', inventoryController.deleteMedia);
 
-router.post('/reservations/create', inventoryController.createReservation);
 
 module.exports = router;

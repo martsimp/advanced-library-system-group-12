@@ -13,6 +13,16 @@ async function getUserCurrentReservations(req, res) {
     }
 }
 
+async function createReservation(req, res) {
+    try {
+        const result = await reservationsService.createReservation(req.body);
+        res.json(result);
+    } catch (error) {
+        throw error;
+        res.status(500).json({ error: error.message });
+    }
+}
+
 async function cancelReservation(req, res) {
     try {
         const { reservationId } = req.params;
@@ -26,5 +36,6 @@ async function cancelReservation(req, res) {
 
 module.exports = {
     getUserCurrentReservations,
+    createReservation,
     cancelReservation
 }; 

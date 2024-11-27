@@ -21,13 +21,6 @@ async function getReservations(filter) {
     return await inventoryRepository.getReservations(filter);
 }
 
-async function createReservation(data) {
-    const user = await userService.getUserByFirebaseUid(data.user);
-    // Transform the user into its database ID which is needed by the reservations table.
-    data.user = user.id;
-    return await inventoryRepository.createReservation(data);
-}
-
 async function deleteReservation(id) {
     return await inventoryRepository.deleteReservation(id);
 }
@@ -50,7 +43,6 @@ module.exports = {
     updateMedia,
     deleteMedia,
     getReservations,
-    createReservation,
     deleteReservation,
     fulfillReservation,
     searchMedia,

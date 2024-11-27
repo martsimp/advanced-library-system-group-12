@@ -1,4 +1,5 @@
 const reservationsRepository = require('./reservationsRepository');
+const userService = require("../user/userService");
 
 async function getUserCurrentReservations(userId) {
     try {
@@ -10,11 +11,19 @@ async function getUserCurrentReservations(userId) {
     }
 }
 
+async function createReservation(data) {
+    const user = await userService.getUserByFirebaseUid(data.user);
+    // Transform the user into its database ID which is needed by the reservations table.
+    data.user = user.id;
+    return await reservationsRepository.createReservation(data);
+}
+
 async function cancelReservation(reservationId) {
     return await reservationsRepository.cancelReservation(reservationId);
 }
 
 module.exports = {
     getUserCurrentReservations,
+    createReservation,
     cancelReservation
 }; 
