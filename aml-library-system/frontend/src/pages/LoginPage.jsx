@@ -28,8 +28,20 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-      localStorage.setItem('firebaseUid', userCredential.user.uid);
-      navigate('/dashboard');
+      const firebaseUid = userCredential.user.uid;
+      localStorage.setItem('firebaseUid', firebaseUid);
+      
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${firebaseUid}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      const userData = await response.json();
+      
+      if (userData.role === 'manager') {
+        navigate('/transfer');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Full Login error object:', err);
       console.error('Login error code:', err.code);
