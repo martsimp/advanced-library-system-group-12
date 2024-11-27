@@ -12,8 +12,13 @@ async function renewBook(transactionId, newDueDate) {
     return await transactionsRepository.renewBook(transactionId, newDueDate);
 }
 
+async function borrowMedia(userId, mediaId, branchId) {
+    return await transactionsRepository.borrowMedia(userId, mediaId, branchId);
+}
+
 module.exports = {
     getUserCurrentBorrowings,
     getUserReadingHistory,
-    renewBook
+    renewBook,
+    borrowMedia
 };

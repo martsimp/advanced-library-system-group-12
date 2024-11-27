@@ -35,8 +35,24 @@ async function renewBook(req, res) {
     }
 }
 
+async function borrowMedia(req, res) {
+    try {
+        const { userId, mediaId, branchId } = req.body;
+        if (!userId || !mediaId || !branchId) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+        
+        const transaction = await transactionsService.borrowMedia(userId, mediaId, branchId);
+        res.json(transaction);
+    } catch (error) {
+        console.error('Error borrowing media:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getUserCurrentBorrowings,
     getUserReadingHistory,
-    renewBook
+    renewBook,
+    borrowMedia
 }; 

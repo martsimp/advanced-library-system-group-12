@@ -73,8 +73,58 @@ async function renewBook(transactionId, newDueDate) {
     return result.rows[0];
 }
 
+async function borrowMedia(userId, mediaId, branchId) {
+    const client = await db.connect();
+    try {
+        await client.query('BEGIN');
+
+        // Check media availability in branch
+        const availabilityQuery = `
+            SELECT available_copies 
+            FROM branch_media_inventory 
+            WHERE branch_id = $1 AND media_id = $2
+        `;
+        const availabilityResult = await client.query(availabilityQuery, [branchId, mediaId]);
+        
+        if (!availabilityResult.rows[0] || availabilityResult.rows[0].available_copies < 1) {
+            throw new Error('Media not available at this branch');
+        }
+
+        // Create transaction
+        const borrowQuery = `
+            INSERT INTO transactions (
+                user_id, media_id, branch_id, 
+                borrow_date, due_date, status
+            ) VALUES (
+                $1, $2, $3, 
+                CURRENT_TIMESTAMP, 
+                CURRENT_TIMESTAMP + INTERVAL '14 days',
+                'borrowed'
+            ) RETURNING *
+        `;
+        const borrowResult = await client.query(borrowQuery, [userId, mediaId, branchId]);
+
+        // Update inventory
+        const updateInventoryQuery = `
+            UPDATE branch_media_inventory 
+            SET available_copies = available_copies - 1
+            WHERE branch_id = $1 AND media_id = $2
+        `;
+        await client.query(updateInventoryQuery, [branchId, mediaId]);
+
+        await client.query('COMMIT');
+        return borrowResult.rows[0];
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
 module.exports = {
     getUserCurrentBorrowings,
     getUserReadingHistory,
-    renewBook
+    renewBook,
+    borrowMedia
 }; 
