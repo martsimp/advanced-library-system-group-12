@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
+import { Button } from "./ui/Button"
 
 const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
   const [selectedBranch, setSelectedBranch] = useState('');
   const [transferQty, setTransferQty] = useState(1);
   const [branchError, setBranchError] = useState('');
   const [quantityError, setQuantityError] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  if (!show) return null; 
+  if (!show) return null;
 
   // Validate form before transferring
   const handleTransfer = () => {
@@ -35,21 +38,26 @@ const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
       return;
     }
 
-    // If there are no errors, proceed with the transfer
+    // If there are no errors, show confirmation dialog
     if (!hasError) {
-      console.log('Transferring media:', {
-        mediaId: mediaItem.media_id,
-        targetBranch: selectedBranch,
-        quantity: transferQty,
-      });
-
-      // Call onTransfer prop to handle the actual transfer
-      onTransfer(mediaItem.media_id, selectedBranch, transferQty);
-
-      setSelectedBranch('');
-      setTransferQty(1);
-      onClose();
+      setShowConfirmation(true);
     }
+  };
+
+  const confirmTransfer = () => {
+    console.log('Transferring media:', {
+      mediaId: mediaItem.media_id,
+      targetBranch: selectedBranch,
+      quantity: transferQty,
+    });
+
+    // Call onTransfer prop to handle the actual transfer
+    onTransfer(mediaItem.media_id, selectedBranch, transferQty);
+
+    setSelectedBranch('');
+    setTransferQty(1);
+    setShowConfirmation(false);
+    onClose();
   };
 
   return (
@@ -101,26 +109,42 @@ const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
-            <button
+            <Button
               onClick={() => {
-                // Reset form and close modal
                 setSelectedBranch('');
                 setTransferQty(1);
                 onClose();
               }}
-              className="px-4 py-2 bg-gray-300 rounded"
+              variant="outline" 
+              className="hover:bg-gray-100"
             >
               Cancel
-            </button>
+            </Button>
             <button
               onClick={handleTransfer}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
             >
               Transfer
             </button>
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      {showConfirmation && (
+        <Dialog open={showConfirmation} onOpenChange={() => setShowConfirmation(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Transfer</DialogTitle>
+            </DialogHeader>
+            <p>Are you sure you want to transfer {transferQty} item(s) of "{mediaItem?.media_name}" to the selected branch?</p>
+            <DialogFooter>
+              <Button className="hover:bg-gray-100" variant="outline" onClick={() => setShowConfirmation(false)}>Cancel</Button>
+              <button onClick={confirmTransfer} className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800">Confirm</button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
