@@ -73,7 +73,7 @@ async function createReservation(data) {
     const existing = await getReservations({ media_id: data.media_id, branch_id: data.branch_id });
     const queue = Math.max(...existing.map(o => o.queue_position), 0) + 1;
 
-    const sql = format("INSERT INTO reservations (user_id, media_id, branch_id, reserve_date, status, queue_position, notification_sent) VALUES (%L, %L, %L, CURRENT_TIMESTAMP(), 'active', %L, false) RETURNING id",
+    const sql = format("INSERT INTO reservations (user_id, media_id, branch_id, reserve_date, status, queue_position, notification_sent) VALUES (%L, %L, %L, CURRENT_TIMESTAMP, 'active', %L, false) RETURNING id",
         data.user, data.media_id, data.branch_id, queue);
     const result = await db.query(sql);
     return result.rows[0];
