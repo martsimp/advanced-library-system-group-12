@@ -167,29 +167,34 @@ const TransferPage = () => {
         </div>
       </aside>
 
-      <main className="flex-1 p-5 overflow-y-auto">
-        <div className="mx-auto">
+      <main className="flex-1 p-5 overflow-y-auto mx-auto">
+        {/* Media inventory header and Add Media button */}
+        <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold">Media Inventory</h1>
+          </div>
+          <div className="mb-4 bg-white shadow-md rounded-md p-4 border">
+          <p className="text-lg font-semibold text-gray-700 mb-4">
+            Add new media from the warehouse to the branch.
+          </p>
+            <Button onClick={() => setShowAddModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+              Add Media
+            </Button>
+          </div>
+
+          <div className="bg-white shadow-md rounded-md p-4 border">
 
           {/* Branch selection */}
-          <h1 className="text-2xl font-bold mb-4">{currentBranch ? currentBranch.name : 'Select a Branch'}</h1>
+          <h1 className="text-xl font-bold mb-4 text-gray-600">{currentBranch ? currentBranch.name : 'Select a Branch'}</h1>
           <div className="flex space-x-2 mb-4">
             {branches.map((branch) => (
               <button
                 key={branch.id}
                 onClick={() => handleBranchChange(branch)}
-                className={`w-full px-4 py-4 rounded ${currentBranch && currentBranch.id === branch.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                className={`w-full px-4 py-4 rounded ${currentBranch && currentBranch.id === branch.id ? 'bg-blue-700 text-white hover:bg-blue-800' : 'bg-gray-200 text-gray-400 hover:bg-gray-300'}`}
               >
                 {branch.name}
               </button>
             ))}
-          </div>
-
-          {/* Media inventory header and Add Media button */}
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-xl font-bold">Media Inventory</h4>
-            <Button onClick={() => setShowAddModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-              Add Media
-            </Button>
           </div>
 
           {/* Media table component */}

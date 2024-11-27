@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from "./ui/Button"
 
 const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -132,15 +133,16 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
 
           {/* Modal Action Buttons */}
           <div className="flex justify-end gap-2">
-            <button
+            <Button
               onClick={onClose} 
-              className="px-4 py-2 bg-gray-300 rounded"
+              className="px-4 rounded hover:bg-gray-100"
+              variant="outline"
             >
               Cancel
-            </button>
+            </Button>
             <button
               onClick={handleAdd}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
             >
               Add Media
             </button>
