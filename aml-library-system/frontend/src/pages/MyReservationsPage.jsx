@@ -130,6 +130,7 @@ export default function MyReservationsPage() {
                       <div>
                         <h3 className="font-medium">{reservation.title}</h3>
                         <p className="text-sm text-gray-500">by {reservation.author}</p>
+                        <p className="text-sm text-gray-500">at {reservation.branch_name}</p>
                         <div className="mt-2">
                           <Badge variant="secondary">
                             {reservation.status === 'fulfilled' 
