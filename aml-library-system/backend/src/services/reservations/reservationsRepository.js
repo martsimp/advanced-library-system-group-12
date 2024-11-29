@@ -30,7 +30,9 @@ async function getUserCurrentReservations(userId, mediaId) {
     `;
     
     try {
-        const result = await db.query(query, [userId, mediaId]);
+        let params = [userId];
+        if (mediaId) params.push(mediaId);
+        const result = await db.query(query, params);
         console.log('Reservations query result:', result.rows); // Debug log
         return result.rows;
     } catch (error) {
