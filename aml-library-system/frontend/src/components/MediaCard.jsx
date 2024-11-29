@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { Book } from 'lucide-react';
@@ -16,6 +17,7 @@ export default function MediaCard({ media }) {
     const { currentUser } = useAuth();
     const [reservations, setReservations] = useState([]);
     const [reservedHere, setReservedHere] = useState(false);
+    const navigate = useNavigate();
 
     const fetchBranches = async () => {
         try {
@@ -55,6 +57,7 @@ export default function MediaCard({ media }) {
 
             setShowReserveModal(false);
             setSelectedBranch('');
+            navigate('/my-reservations');
         } catch (error) {
             setError(error.message);
         } finally {
