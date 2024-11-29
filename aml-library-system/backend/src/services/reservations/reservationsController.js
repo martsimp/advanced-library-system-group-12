@@ -3,8 +3,9 @@ const reservationsService = require('./reservationsService');
 async function getUserCurrentReservations(req, res) {
     try {
         const { userId } = req.params;
+        const { mediaId } = req.query;
         console.log('Fetching reservations for user ID:', userId); // Debug log
-        const reservations = await reservationsService.getUserCurrentReservations(userId);
+        const reservations = await reservationsService.getUserCurrentReservations(userId, mediaId);
         console.log('Found reservations:', reservations); // Debug log
         res.json(reservations);
     } catch (error) {

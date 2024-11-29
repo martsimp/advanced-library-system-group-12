@@ -1,10 +1,10 @@
 const reservationsRepository = require('./reservationsRepository');
 const userService = require("../user/userService");
 
-async function getUserCurrentReservations(userId) {
+async function getUserCurrentReservations(userId, mediaId) {
     try {
         console.log('Getting reservations for user:', userId); // Debug log
-        return await reservationsRepository.getUserCurrentReservations(userId);
+        return await reservationsRepository.getUserCurrentReservations(userId, mediaId);
     } catch (error) {
         console.error('Error in reservations service:', error);
         throw error;

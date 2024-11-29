@@ -2,8 +2,8 @@ const db = require('../../config/database');
 const format = require("pg-format");
 const SqlFilter = require("../../utils/sqlFilter");
 
-async function getUserCurrentReservations(userId) {
-    const query = `
+async function getUserCurrentReservations(userId, mediaId) {
+    let query = `
         SELECT 
             r.id as reservation_id,
             r.reserve_date,
@@ -12,17 +12,25 @@ async function getUserCurrentReservations(userId) {
             m.title,
             m.author,
             m.id as media_id,
+            b.id as branch_id,
             b.name as branch_name
         FROM reservations r
         JOIN media m ON r.media_id = m.id
         JOIN branches b ON r.branch_id = b.id
         WHERE r.user_id = $1 
+    `;
+
+    if (mediaId) {
+        query += ` AND r.media_id = $2 `;
+    }
+
+    query += `
         AND r.status IN ('active', 'fulfilled')
         ORDER BY r.reserve_date ASC
     `;
     
     try {
-        const result = await db.query(query, [userId]);
+        const result = await db.query(query, [userId, mediaId]);
         console.log('Reservations query result:', result.rows); // Debug log
         return result.rows;
     } catch (error) {

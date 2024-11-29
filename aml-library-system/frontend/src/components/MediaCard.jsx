@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { Card, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { Book } from 'lucide-react';
@@ -14,6 +14,8 @@ export default function MediaCard({ media }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { currentUser } = useAuth();
+    const [reservations, setReservations] = useState([]);
+    const [reservedHere, setReservedHere] = useState(false);
 
     const fetchBranches = async () => {
         try {
@@ -59,6 +61,40 @@ export default function MediaCard({ media }) {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const fetchReservations = async () => {
+            try {
+                setLoading(true);
+                const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${currentUser.uid}`);
+                if (!userResponse.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+                const userData = await userResponse.json();
+
+                const params = new URLSearchParams({ "mediaId": media.id });
+                const reservationsResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations/user/${userData.id}/current?${params}`);
+                if (!reservationsResponse.ok) {
+                    throw new Error('Failed to fetch reservations');
+                }
+                const reservationsData = await reservationsResponse.json();
+                setReservations(reservationsData);
+            } catch (error) {
+                console.error('Error fetching reservations:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (currentUser) {
+            fetchReservations();
+        }
+    }, [currentUser, media]);
+
+    // Check if the user has a reservation active at the selected branch
+    const checkReservedAtSelectedBranch = () => {
+        setReservedHere(reservations.some(r => r.branch_id === parseInt(selectedBranch)));
+    }
 
     return (
         <Card className="w-full h-full">
@@ -135,7 +171,7 @@ export default function MediaCard({ media }) {
                             </label>
                             <select
                                 value={selectedBranch}
-                                onChange={(e) => setSelectedBranch(e.target.value)}
+                                onChange={(e) => {setSelectedBranch(e.target.value); checkReservedAtSelectedBranch(); }}
                                 className="w-full border rounded-md p-2"
                             >
                                 <option value="">Select a branch</option>
@@ -163,7 +199,7 @@ export default function MediaCard({ media }) {
                         </Button>
                         <Button
                             onClick={handleReserve}
-                            disabled={loading || !selectedBranch}
+                            disabled={loading || !selectedBranch || reservedHere }
                             className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                             {loading ? 'Reserving...' : 'Confirm Reservation'}
