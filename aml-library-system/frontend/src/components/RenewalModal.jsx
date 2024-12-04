@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "./ui/Button";
 import { Calendar } from "lucide-react";
 import { format } from "date-fns";
+import toast from 'react-hot-toast';
 
 export function RenewalModal({ book, isOpen, onClose, onRenew }) {
   const currentDueDate = new Date(book.due_date);
@@ -9,30 +10,11 @@ export function RenewalModal({ book, isOpen, onClose, onRenew }) {
 
   const handleRenew = async () => {
     try {
-      console.log('Renewing book with transaction ID:', book.transaction_id);
-      
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/transactions/${book.transaction_id}/renew`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          new_due_date: newDueDate
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to renew book');
-      }
-      
-      const updatedTransaction = await response.json();
-      console.log('Renewal successful:', updatedTransaction);
-      
-      onRenew(book.transaction_id, newDueDate);
+      await onRenew(book.transaction_id, newDueDate);
+      toast.success(`Successfully renewed "${book.title}"`);
       onClose();
     } catch (error) {
-      console.error('Error renewing book:', error);
+      toast.error('Failed to renew: ' + error.message);
     }
   };
 

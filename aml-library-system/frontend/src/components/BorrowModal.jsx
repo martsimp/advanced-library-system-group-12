@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
 import { Button } from './ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function BorrowModal({ show, onClose, mediaItem }) {
     const [selectedBranch, setSelectedBranch] = useState('');
@@ -72,9 +73,10 @@ export default function BorrowModal({ show, onClose, mediaItem }) {
                 throw new Error('Failed to borrow media');
             }
 
+            toast.success(`Successfully borrowed "${mediaItem.title}"`);
             onClose();
         } catch (error) {
-            setError(error.message);
+            toast.error('Failed to borrow: ' + error.message);
         } finally {
             setLoading(false);
         }

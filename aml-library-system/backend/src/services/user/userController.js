@@ -40,27 +40,7 @@ async function registerUser(req, res) {
     }
 }
 
-async function updateUser(req, res) {
-    try {
-        const updatedUser = await userService.updateUser(req.params.id, req.body);
-        res.json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
-async function deleteUser(req, res) {
-    try {
-        await userService.deleteUser(req.params.id);
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
 module.exports = {
     getUserByFirebaseUid,
-    registerUser,
-    updateUser,
-    deleteUser
+    registerUser
 };

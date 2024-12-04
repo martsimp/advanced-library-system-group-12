@@ -40,38 +40,7 @@ async function createUser(userData) {
     return result.rows[0];
 }
 
-async function updateUser(id, userData) {
-    const query = `
-        UPDATE users
-        SET name = $1, email = $2, phone = $3, street_address = $4,
-            city = $5, postal_code = $6, notifications_enabled = $7
-        WHERE id = $8
-        RETURNING *
-    `;
-    
-    const values = [
-        userData.name,
-        userData.email,
-        userData.phone,
-        userData.street_address,
-        userData.city,
-        userData.postal_code,
-        userData.notifications_enabled,
-        id
-    ];
-
-    const result = await db.query(query, values);
-    return result.rows[0];
-}
-
-async function deleteUser(id) {
-    const query = 'DELETE FROM users WHERE id = $1';
-    await db.query(query, [id]);
-}
-
 module.exports = {
     getUserByFirebaseUid,
-    createUser,
-    updateUser,
-    deleteUser
+    createUser
 };

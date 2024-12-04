@@ -6,6 +6,7 @@ import { Book } from 'lucide-react';
 import BorrowModal from './BorrowModal';
 import { useAuth } from '../contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
+import toast from 'react-hot-toast';
 
 export default function MediaCard({ media }) {
     const [showBorrowModal, setShowBorrowModal] = useState(false);
@@ -55,10 +56,12 @@ export default function MediaCard({ media }) {
                 throw new Error('Failed to create reservation');
             }
 
+            toast.success(`Successfully reserved "${media.title}"`);
             setShowReserveModal(false);
             setSelectedBranch('');
             navigate('/my-reservations');
         } catch (error) {
+            toast.error('Failed to reserve: ' + error.message);
             setError(error.message);
         } finally {
             setLoading(false);

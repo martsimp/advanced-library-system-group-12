@@ -8,17 +8,7 @@ async function createUser(userData) {
     return await userRepository.createUser(userData);
 }
 
-async function updateUser(id, userData) {
-    return await userRepository.updateUser(id, userData);
-}
-
-async function deleteUser(id) {
-    return await userRepository.deleteUser(id);
-}
-
 module.exports = {
     getUserByFirebaseUid,
-    createUser,
-    updateUser,
-    deleteUser
+    createUser
 };

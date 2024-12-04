@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/Button"
+import toast from 'react-hot-toast';
 
 const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -44,20 +45,14 @@ const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
     }
   };
 
-  const confirmTransfer = () => {
-    console.log('Transferring media:', {
-      mediaId: mediaItem.media_id,
-      targetBranch: selectedBranch,
-      quantity: transferQty,
-    });
-
-    // Call onTransfer prop to handle the actual transfer
-    onTransfer(mediaItem.media_id, selectedBranch, transferQty);
-
-    setSelectedBranch('');
-    setTransferQty(1);
-    setShowConfirmation(false);
-    onClose();
+  const confirmTransfer = async () => {
+    try {
+      await onTransfer(mediaItem.media_id, selectedBranch, transferQty);
+      toast.success(`Successfully transferred ${transferQty} copies of "${mediaItem.media_name}"`);
+      onClose();
+    } catch (error) {
+      toast.error('Transfer failed: ' + error.message);
+    }
   };
 
   return (
