@@ -246,65 +246,10 @@ export default function MemberDashboard() {
       <main className="flex-1 p-8 ml-64">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">{welcomeMessage}</h1>
-          <div className="flex items-center gap-4 relative z-50">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="bg-white border-gray-200 hover:bg-gray-100"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notifications
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[300px]">
-                <DropdownMenuLabel>Recent Notifications</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {borrowedBooks.length > 0 ? (
-                  borrowedBooks.map(book => (
-                    <DropdownMenuItem key={book.transaction_id}>
-                      <span className="text-sm">
-                        "{book.title}" is due in {Math.ceil((new Date(book.due_date) - new Date()) / (1000 * 60 * 60 * 24))} days
-                      </span>
-                    </DropdownMenuItem>
-                  ))
-                ) : (
-                  <DropdownMenuItem disabled>No notifications</DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline"
-                  className="bg-white border-gray-200 hover:bg-gray-100"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Account
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="h-4 w-4 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-red-600 focus:text-red-600"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <div className="flex items-center space-x-4">
+            <Button onClick={handleLogout} variant="outline" size="sm">
+                Log Out
+            </Button>
           </div>
         </div>
 

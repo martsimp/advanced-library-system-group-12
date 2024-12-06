@@ -9,7 +9,6 @@ CREATE TABLE users (
     street_address VARCHAR(255),
     city VARCHAR(100),
     postal_code VARCHAR(20),
-    notifications_enabled BOOLEAN DEFAULT true,
     outstanding_fines DECIMAL(10,2) DEFAULT 0.00,
     firebase_uid VARCHAR(128) UNIQUE
 );
@@ -74,15 +73,4 @@ CREATE TABLE transactions (
     return_date TIMESTAMP,
     status VARCHAR(50) CHECK (status IN ('borrowed', 'returned', 'overdue')),
     fine DECIMAL(10,2) DEFAULT 0.00
-);
-
--- NOTIFICATIONS TABLE
-CREATE TABLE notifications (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    media_id INTEGER REFERENCES media(id),
-    notification_type VARCHAR(50) CHECK (notification_type IN ('reservation_available', 'due_date', 'overdue')),
-    sent_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    message TEXT,
-    status VARCHAR(50) CHECK (status IN ('sent', 'pending', 'failed'))
 ); 

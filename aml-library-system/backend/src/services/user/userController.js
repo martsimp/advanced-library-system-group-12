@@ -27,7 +27,6 @@ async function registerUser(req, res) {
             street_address: req.body.street_address,
             city: req.body.city,
             postal_code: req.body.postal_code,
-            notifications_enabled: req.body.notifications_enabled,
             role: 'member',
             outstanding_fines: 0
         };

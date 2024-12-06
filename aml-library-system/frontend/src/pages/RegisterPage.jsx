@@ -49,7 +49,6 @@ export default function RegisterPage() {
           street_address: formData.street_address,
           city: formData.city,
           postal_code: formData.postal_code,
-          notifications_enabled: true,
           role: 'member',
           outstanding_fines: 0
         }),
