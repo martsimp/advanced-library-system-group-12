@@ -46,23 +46,6 @@ async function getBranchMedia(req, res) {
   }
 }
 
-// Add media to branch
-async function getMediaInfo(req, res) {
-  const { mediaName } = req.params;
-
-  try {
-    const mediaInfo = await transferService.getMediaByName(mediaName);
-    if (mediaInfo) {
-      res.json(mediaInfo);
-    } else {
-      res.status(404).json({ error: 'Media not found' });
-    }
-  } catch (error) {
-    console.error("Error fetching media info:", error);
-    res.status(500).json({ error: error.message });
-  }
-}
-
 // add media to a specific branch
 async function addMediaToBranch(req, res) {
   const { mediaName, quantity, branchName } = req.body;
@@ -84,6 +67,24 @@ async function addMediaToBranch(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
+// Add media to branch
+async function getMediaInfo(req, res) {
+  const { mediaName } = req.params;
+
+  try {
+    const mediaInfo = await transferService.getMediaByName(mediaName);
+    if (mediaInfo) {
+      res.json(mediaInfo);
+    } else {
+      res.status(404).json({ error: 'Media not found' });
+    }
+  } catch (error) {
+    console.error("Error fetching media info:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 
 module.exports = {
   getMediaAndBranches,

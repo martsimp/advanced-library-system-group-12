@@ -21,30 +21,27 @@ async function transferMedia(mediaId, fromBranchId, toBranchId, quantity) {
   try {
     await client.query('BEGIN');
 
-    const sourceInventoryQuery = `
-      SELECT available_copies
-      FROM branch_media_inventory
-      WHERE branch_id = $1 AND media_id = $2
-    `;
-    const sourceInventoryResult = await client.query(sourceInventoryQuery, [fromBranchId, mediaId]);
-    const sourceAvailableCopies = sourceInventoryResult.rows[0]?.available_copies;
-
+    // Check available copies in the source branch
+    const sourceAvailableCopies = await transferRepository.getAvailableCopies(fromBranchId, mediaId, client);
     if (!sourceAvailableCopies || sourceAvailableCopies < quantity) {
       throw new Error(`Not enough copies available in the source branch. Only ${sourceAvailableCopies || 0} copies available.`);
     }
-    await transferRepository.updateBranchInventory(fromBranchId, mediaId, -quantity, client);
-    await transferRepository.updateBranchInventory(toBranchId, mediaId, quantity, client);
-    await client.query('COMMIT');
 
+    // Update branch inventories
+    await transferRepository.updateBranchInventory(fromBranchId, mediaId, -quantity, client);
+    await transferRepository.updateBranchInventory(toBranchId, mediaId, quantity, client); 
+
+    await client.query('COMMIT');
     return { message: 'Transfer successful' };
   } catch (error) {
     await client.query('ROLLBACK');
     console.error("Error during transfer:", error.message);
-    throw error; 
+    throw error;
   } finally {
     client.release();
   }
 }
+
 
 // Fetch media by name
 async function getMediaByName(mediaName) {

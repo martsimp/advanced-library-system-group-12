@@ -26,24 +26,6 @@ async function getAllBranches() {
   return result.rows; 
 }
 
-// Update media quantity in the media table
-async function updateMediaQuantity(mediaId, quantity) {
-  const query = `
-    UPDATE media
-    SET total_copies = total_copies + $1
-    WHERE id = $2
-    RETURNING id, title, total_copies;
-  `;
-  const values = [quantity, mediaId];
-  const result = await pool.query(query, values);
-
-  if (result.rowCount === 0) {
-    throw new Error(`Media with ID ${mediaId} not found`);
-  }
-
-  return result.rows[0];
-}
-
 // Fetch media for a specific branch
 async function getBranchMedia(branchId) {
   const query = 
@@ -97,6 +79,17 @@ async function updateMediaQuantity(mediaId, quantity, client) {
   return result.rows[0];
 }
 
+// Fetch quantity of media from branch_media_inventory table
+async function getAvailableCopies(branchId, mediaId, client) {
+  const query = `
+    SELECT available_copies
+    FROM branch_media_inventory
+    WHERE branch_id = $1 AND media_id = $2;
+  `;
+  const result = await (client || pool).query(query, [branchId, mediaId]);
+  return result.rows[0]?.available_copies;
+}
+
 // Update branch inventory (either insert or update the media quantity)
 async function updateBranchInventory(branchId, mediaId, quantity, client) {
   const query = `
@@ -120,4 +113,5 @@ module.exports = {
 
   getMediaByName,
   getBranchByName,
+  getAvailableCopies
 };
