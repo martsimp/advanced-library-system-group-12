@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "./ui/Button"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Button } from './ui/Button';
 
 const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -9,6 +10,7 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
   const [quantityError, setQuantityError] = useState('');
   const [mediaError, setMediaError] = useState('');
   const [availableQuantity, setAvailableQuantity] = useState(0);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
     if (mediaName) {
@@ -70,16 +72,22 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
     // If no errors, proceed to add the media
     if (!hasError) {
       try {
+        console.log('Success: Media added');
+        setShowSuccessMessage(true); 
         console.log('Attempting to add media:', { mediaName, quantity, branchName: selectedBranch });
         await onAdd(mediaName, quantity, selectedBranch);
         setMediaName('');
         setQuantity(1);
         setSelectedBranch('');
-        onClose(); 
       } catch (error) {
-        console.error('Error adding media:', error); 
+        console.error('Error adding media:', error);
       }
     }
+  };
+
+  const closeSuccessMessage = () => {
+    setShowSuccessMessage(false);
+    onClose();
   };
 
   return (
@@ -147,6 +155,26 @@ const AddMediaModal = ({ isOpen, onClose, onAdd, branches }) => {
               Add Media
             </button>
           </div>
+
+          {showSuccessMessage && (
+            <Dialog open={showSuccessMessage}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Media successfully added to the branch.</DialogTitle>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    className="hover:bg-gray-100"
+                    variant="outline"
+                    onClick={closeSuccessMessage}
+                  >
+                    Close
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+
         </div>
       </div>
     </div>
