@@ -81,64 +81,69 @@ export default function CatalogPage() {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <main className="max-w-7xl mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-8">Library Catalog</h1>
 
                 {/* Search and Filters Card */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <section className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                         {/* Search Input */}
                         <div className="lg:col-span-2">
+                            <label htmlFor="searchQuery" className="sr-only">
+                                Search by title, author, or description
+                            </label>
                             <Input
+                                id="searchQuery"
                                 placeholder="Search by title, author, or description..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={handleKeyPress}
                                 className="w-full"
+                                aria-labelledby="searchQuery"
                             />
                         </div>
 
                         {/* Genre Filter */}
-                        <Select value={genre} onValueChange={setGenre}>
+                        <Select value={genre} onValueChange={setGenre} aria-label="Select Genre">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select Genre" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Genres</SelectItem>
                                 {filterOptions.genres.map((g) => (
-                                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                                    <SelectItem key={g} value={g} aria-label={`Genre: ${g}`}>{g}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
 
                         {/* Format Filter */}
-                        <Select value={format} onValueChange={setFormat}>
+                        <Select value={format} onValueChange={setFormat} aria-label="Select Format">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select Format" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Formats</SelectItem>
                                 {filterOptions.formats.map((f) => (
-                                    <SelectItem key={f} value={f}>{f}</SelectItem>
+                                    <SelectItem key={f} value={f} aria-label={`Format: ${f}`}>{f}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
 
                         {/* Status Filter */}
-                        <Select value={status} onValueChange={setStatus}>
+                        <Select value={status} onValueChange={setStatus} aria-label="Select Status">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select Status" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Status</SelectItem>
                                 {filterOptions.statuses.map((s) => (
-                                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    <SelectItem key={s} value={s} aria-label={`Status: ${s}`}>{s}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
 
                         {/* Sort By */}
-                        <Select value={sortBy} onValueChange={setSortBy}>
+                        <Select value={sortBy} onValueChange={setSortBy} aria-label="Sort By">
                             <SelectTrigger>
                                 <SelectValue placeholder="Sort By" />
                             </SelectTrigger>
@@ -161,7 +166,7 @@ export default function CatalogPage() {
                             {loading ? 'Searching...' : 'Search'}
                         </Button>
                     </div>
-                </div>
+                </section>
 
                 {/* Results Grid */}
                 {media.length > 0 && (
@@ -193,7 +198,14 @@ export default function CatalogPage() {
                         )}
                     </div>
                 )}
-            </div>
+            </main>
+
+            {/* For NoScript Support */}
+            <noscript>
+                <div className="text-center py-12 bg-white rounded-lg shadow-md">
+                    <p className="text-xl font-semibold text-gray-900">JavaScript is required to view this page properly.</p>
+                </div>
+            </noscript>
         </div>
     );
-} 
+}

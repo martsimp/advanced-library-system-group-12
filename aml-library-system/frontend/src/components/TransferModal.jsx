@@ -65,8 +65,9 @@ const TransferModal = ({ show, onClose, onTransfer, branches, mediaItem }) => {
           </p>
 
           <div className="mb-4">
-            <label className="block mb-2">Quantity to Transfer:</label>
+            <label htmlFor="transferQty" className="block mb-2">Quantity to Transfer:</label>
             <input
+              id="transferQty"
               type="number"
               min="1"
               max={mediaItem?.quantity || 1}

@@ -140,64 +140,69 @@ const TransferPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <aside className="w-64 bg-white shadow-md">
+      <aside className="w-64 bg-white shadow-md" aria-label="Sidebar navigation">
         <nav className="p-5 space-y-2">
           <h1 className="text-2xl font-bold mb-4">WELCOME BACK</h1>
 
-          {/* Sidebar links */}
-          <Link to="/transfer" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border ${location.pathname === '/transfer' ? 'bg-gray-300' : ''}`}>
+          {/* Sidebar links with aria-label */}
+          <Link to="/transfer" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border ${location.pathname === '/transfer' ? 'bg-gray-300' : ''}`} aria-label="Transfer Media">
             <BiTransfer className="text-xl" />
             <span>Transfer Media</span>
           </Link>
-          <Link to="/inventory" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border ${location.pathname === '/inventory' ? 'bg-gray-300' : ''}`}>
+          <Link to="/inventory" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border`} aria-label="Manage Inventory">
             <FaBoxes className="text-xl" />
             <span>Manage Inventory</span>
           </Link>
-          <Link to="/branches" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border ${location.pathname === '/branches' ? 'bg-gray-300' : ''}`}>
+          <Link to="/branches" className={`flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded transition-colors duration-200 border`} aria-label="View Branches">
             <HiOutlineHome className="text-xl" />
             <span>View Branches</span>
           </Link>
         </nav>
 
-        {/* Logout button */}
+        {/* Logout button with aria-label */}
         <div className="absolute bottom-0 w-64 p-5">
-          <button onClick={handleLogout} className="w-full flex items-center justify-center px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded transition-colors duration-200 border">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded transition-colors duration-200 border"
+            aria-label="Logout"
+          >
             Logout
           </button>
         </div>
       </aside>
 
       <main className="flex-1 p-5 overflow-y-auto mx-auto">
-        {/* Media inventory header and Add Media button */}
         <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">Media Inventory</h1>
-          </div>
-          <div className="mb-4 bg-white shadow-md rounded-md p-4 border">
+        </div>
+        <div className="mb-4 bg-white shadow-md rounded-md p-4 border">
           <p className="text-lg font-semibold text-gray-700 mb-4">
             Add new media from the warehouse to the branch.
           </p>
-            <Button onClick={() => setShowAddModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-              Add Media
-            </Button>
-          </div>
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            aria-label="Add Media"
+          >
+            Add Media
+          </Button>
+        </div>
 
-          <div className="bg-white shadow-md rounded-md p-4 border">
-
-          {/* Branch selection */}
+        <div className="bg-white shadow-md rounded-md p-4 border">
           <h1 className="text-xl font-bold mb-4 text-gray-600">{currentBranch ? currentBranch.name : 'Select a Branch'}</h1>
           <div className="flex space-x-2 mb-4">
             {branches.map((branch) => (
               <button
                 key={branch.id}
                 onClick={() => handleBranchChange(branch)}
-                className={`w-full px-4 py-4 rounded ${currentBranch && currentBranch.id === branch.id ? 'bg-blue-700 text-white hover:bg-blue-800' : 'bg-gray-200 text-gray-400 hover:bg-gray-300'}`}
+                className={`w-full px-4 py-4 rounded ${currentBranch && currentBranch.id === branch.id ? 'bg-blue-700 text-white hover:bg-blue-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                aria-label={`Select branch ${branch.name}`}
               >
                 {branch.name}
               </button>
             ))}
           </div>
 
-          {/* Media table component */}
           <MediaTable
             mediaList={mediaList}
             branches={branches.filter(b => b.id !== currentBranch.id)}
@@ -214,6 +219,7 @@ const TransferPage = () => {
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddMedia}
           branches={branches}
+          aria-labelledby="add-media-modal"
         />
       )}
     </div>

@@ -132,6 +132,7 @@ export default function BorrowModal({ show, onClose, mediaItem }) {
                     <Button
                         onClick={handleBorrow}
                         disabled={loading || !selectedBranch || availability < 1}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6"
                     >
                         {loading ? 'Borrowing...' : 'Borrow'}
                     </Button>
