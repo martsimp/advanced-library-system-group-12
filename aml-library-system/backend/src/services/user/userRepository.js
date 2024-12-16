@@ -18,8 +18,9 @@ async function createUser(userData) {
             postal_code,
             notifications_enabled,
             role,
-            outstanding_fines
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            outstanding_fines,
+            has_seen_tutorial
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING *
     `;
     
@@ -33,14 +34,27 @@ async function createUser(userData) {
         userData.postal_code,
         userData.notifications_enabled,
         userData.role,
-        userData.outstanding_fines
+        userData.outstanding_fines,
+        userData.has_seen_tutorial
     ];
 
     const result = await db.query(query, values);
     return result.rows[0];
 }
 
+async function updateTutorialStatus(firebaseUid) {
+    const query = `
+        UPDATE users 
+        SET has_seen_tutorial = true 
+        WHERE firebase_uid = $1
+        RETURNING *
+    `;
+    const result = await db.query(query, [firebaseUid]);
+    return result.rows[0];
+}
+
 module.exports = {
     getUserByFirebaseUid,
-    createUser
+    createUser,
+    updateTutorialStatus
 };

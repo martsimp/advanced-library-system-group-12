@@ -8,7 +8,12 @@ async function createUser(userData) {
     return await userRepository.createUser(userData);
 }
 
+async function updateTutorialStatus(firebaseUid) {
+    return await userRepository.updateTutorialStatus(firebaseUid);
+}
+
 module.exports = {
     getUserByFirebaseUid,
-    createUser
+    createUser,
+    updateTutorialStatus
 };

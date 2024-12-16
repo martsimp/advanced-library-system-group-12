@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LoadingPage, Spinner } from '../components/ui/spinner';
 import { RenewalModal } from '../components/RenewalModal';
 import { CancelReservationModal } from '../components/CancelReservationModal';
+import { TutorialModal } from '../components/TutorialModal';
 
 export default function MemberDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -44,6 +45,7 @@ export default function MemberDashboard() {
   const [isRenewalModalOpen, setIsRenewalModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
@@ -132,6 +134,10 @@ export default function MemberDashboard() {
         const data = await response.json();
         console.log('Received user data:', data);
         setUserData(data);
+        
+        if (!data.has_seen_tutorial) {
+          setShowTutorial(true);
+        }
         
         await fetchBorrowedBooks(data.id);
         await fetchReservations(data.id);
@@ -477,6 +483,12 @@ export default function MemberDashboard() {
             onConfirm={handleCancelReservation}
           />
         )}
+
+        {/* Tutorial Modal */}
+        <TutorialModal 
+          isOpen={showTutorial} 
+          onClose={() => setShowTutorial(false)} 
+        />
       </main>
     </div>
   )
