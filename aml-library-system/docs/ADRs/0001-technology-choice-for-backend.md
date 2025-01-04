@@ -1,4 +1,4 @@
-### Advanced Media Library (AML)
+# Advanced Media Library (AML)
 ## Technology Choice for Backend
 ## Context and Problem Statement
 

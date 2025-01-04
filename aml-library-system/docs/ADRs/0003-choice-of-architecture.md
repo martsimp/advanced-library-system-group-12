@@ -1,4 +1,4 @@
-### Advanced Media Library (AML)
+# Advanced Media Library (AML)
 ## Architecture Style
 ## Context and Problem Statement
 
@@ -7,7 +7,7 @@ Advanced Media Library (AML) is a nationwide network of libraries offering a var
 ## Decision Drivers
 
 * {decision driver 1, e.g., scalability, the system must handle thousands of users simultaneously without having a problem.}
-* {decision driver 2, e.g., Availability, the system must ensure access to media 24/7 both online and in-store.}
+* {decision driver 2, e.g., faster time to market, the development of the AML system must be completed within a shortened timeframe to meet user requirements.}
 * {decision driver 3, e.g., Flexibility, the design must support updates and easy integration of new features when needed.}
 
 ## Considered Options
@@ -39,12 +39,12 @@ Negative (Linkedin, 2024)
 
 ## Pros and Cons of the other Options
 
-# Microservices (IBM, n.d)
+### Microservices (IBM, n.d)
 * Good because of Independent Scaling: Microservices allow each service to be scaled independently without affecting others, enabling better scalability compared to SOA​.
 * Good because of Flexibility: Each service can use different programming languages and technologies.
 * Bad because of Higher Complexity: Managing multiple independent services can increase system complexity, as more components mean more potential points of failure.
 
 
-# Three-tier Architecture (Tutorialspoint, 2024)
+### Three-tier Architecture (Tutorialspoint, 2024)
 * Good because of Security: Since clients do not have direct access to the database, it’s harder for unauthorized users to access sensitive data.
 * Bad because of Performance Issues: Increased complexity and the need for extra work in the middle-tier process may slow the development time.
