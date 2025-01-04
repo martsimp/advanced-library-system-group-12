@@ -80,7 +80,11 @@ async function addMediaToBranch(mediaName, quantity, branchName) {
 
     await client.query('COMMIT');
 
-    return { mediaName: media.title, branchName: branch.name, updatedCopies: inventoryUpdate.available_copies };
+    return { 
+      message: 'Media added successfully', 
+      mediaName: media.title, 
+      branchName: branch.name, 
+      updatedCopies: inventoryUpdate.available_copies };
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
