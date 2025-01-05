@@ -220,29 +220,29 @@ export default function MemberDashboard() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar - Add h-full to ensure full height */}
-      <aside className="w-64 bg-white shadow-md h-full fixed">
+      <aside className="w-64 bg-white shadow-md h-full fixed" role="navigation" aria-label="Main navigation">
         <div className="p-4">
           <h2 className="text-2xl font-bold text-gray-800">AML Member</h2>
         </div>
         <nav className="mt-6">
-          <Link to="/catalog" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            <Book className="inline-block mr-2" />
+          <Link to="/catalog" className="block py-2 px-4 text-gray-700 hover:bg-gray-200" aria-label="Search Library Catalog">
+            <Book className="inline-block mr-2" aria-hidden="true" />
             Search Catalog
           </Link>
-          <Link to="/my-borrowings" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            <CheckCircle className="inline-block mr-2" />
+          <Link to="/my-borrowings" className="block py-2 px-4 text-gray-700 hover:bg-gray-200" aria-label="View My Borrowings">
+            <CheckCircle className="inline-block mr-2" aria-hidden="true" />
             My Borrowings
           </Link>
-          <Link to="/my-reservations" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            <Clock className="inline-block mr-2" />
+          <Link to="/my-reservations" className="block py-2 px-4 text-gray-700 hover:bg-gray-200" aria-label="View My Reservations">
+            <Clock className="inline-block mr-2" aria-hidden="true" />
             My Reservations
           </Link>
-          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            <Calendar className="inline-block mr-2" />
+          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200" aria-label="View Reading History">
+            <Calendar className="inline-block mr-2" aria-hidden="true" />
             Reading History
           </a>
-          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            <Library className="inline-block mr-2" />
+          <a href="#" className="block py-2 px-4 text-gray-700 hover:bg-gray-200" aria-label="View Branch Locations">
+            <Library className="inline-block mr-2" aria-hidden="true" />
             Branch Locations
           </a>
         </nav>
@@ -253,14 +253,14 @@ export default function MemberDashboard() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">{welcomeMessage}</h1>
           <div className="flex items-center space-x-4">
-            <Button onClick={handleLogout} variant="outline" size="sm">
+            <Button onClick={handleLogout} variant="outline" size="sm" aria-label="Log out of your account">
                 Log Out
             </Button>
           </div>
         </div>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-8">
+        <form onSubmit={handleSearch} className="mb-8" role="search">
           <div className="flex gap-2">
             <Input
               type="text"
@@ -268,19 +268,20 @@ export default function MemberDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-grow bg-white"
+              aria-label="Search the library catalog"
             />
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Search className="h-4 w-4 mr-2" />
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white" aria-label="Perform search">
+              <Search className="h-4 w-4 mr-2" aria-hidden="true" />
               Search
             </Button>
           </div>
         </form>
 
         {/* Member Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="bg-white shadow-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="region" aria-label="Dashboard Overview">
+          <Card className="bg-white shadow-lg" role="region" aria-labelledby="borrowings-title">
             <CardHeader>
-              <CardTitle>Current Borrowings</CardTitle>
+              <CardTitle id="borrowings-title">Current Borrowings</CardTitle>
               <CardDescription>Books you currently have checked out</CardDescription>
             </CardHeader>
             <CardContent>
@@ -291,9 +292,9 @@ export default function MemberDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-white shadow-lg" role="region" aria-labelledby="reservations-title">
             <CardHeader>
-              <CardTitle>Active Reservations</CardTitle>
+              <CardTitle id="reservations-title">Active Reservations</CardTitle>
               <CardDescription>Books you've reserved</CardDescription>
             </CardHeader>
             <CardContent>
@@ -302,9 +303,9 @@ export default function MemberDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-white shadow-lg" role="region" aria-labelledby="history-title">
             <CardHeader>
-              <CardTitle>Reading History</CardTitle>
+              <CardTitle id="history-title">Reading History</CardTitle>
               <CardDescription>Books you've read this year</CardDescription>
             </CardHeader>
             <CardContent>
@@ -321,10 +322,10 @@ export default function MemberDashboard() {
         </div>
 
         {/* Currently Borrowed Books */}
-        <Card className="mt-6 bg-white shadow-lg">
+        <Card className="mt-6 bg-white shadow-lg" role="region" aria-labelledby="current-books-title">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Currently Borrowed Books</CardTitle>
+              <CardTitle id="current-books-title">Currently Borrowed Books</CardTitle>
               <CardDescription>Manage your current loans</CardDescription>
             </div>
             {borrowedBooks.length > MAX_DISPLAY_ITEMS && (
@@ -357,6 +358,7 @@ export default function MemberDashboard() {
                       <Button 
                         size="sm"
                         onClick={() => handleRenewalClick(book)}
+                        aria-label={`Renew ${book.title}`}
                       >
                         Renew
                       </Button>
@@ -369,10 +371,10 @@ export default function MemberDashboard() {
         </Card>
 
         {/* Current Reservations */}
-        <Card className="mt-6 bg-white shadow-lg">
+        <Card className="mt-6 bg-white shadow-lg" role="region" aria-labelledby="reservations-list-title">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Current Reservations</CardTitle>
+              <CardTitle id="reservations-list-title">Current Reservations</CardTitle>
               <CardDescription>Manage your reservations</CardDescription>
             </div>
             {reservations.length > MAX_DISPLAY_ITEMS && (
@@ -416,6 +418,7 @@ export default function MemberDashboard() {
                             setSelectedReservation(reservation);
                             setIsCancelModalOpen(true);
                           }}
+                          aria-label={`Cancel reservation for ${reservation.title}`}
                         >
                           Cancel Reservation
                         </Button>
